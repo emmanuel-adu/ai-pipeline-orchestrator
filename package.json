@@ -1,0 +1,90 @@
+{
+  "name": "ai-pipeline-orchestrator",
+  "version": "0.1.0",
+  "description": "Production-ready orchestration framework for AI applications featuring hybrid intent classification, dynamic context optimization, and sequential pipeline architecture",
+  "keywords": [
+    "ai",
+    "orchestration",
+    "intent-classification",
+    "context-optimization",
+    "chatbot",
+    "llm",
+    "claude",
+    "anthropic"
+  ],
+  "author": "Emmanuel Adu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanuel-adu/ai-pipeline-orchestrator"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./intent": {
+      "import": "./dist/intent/index.mjs",
+      "require": "./dist/intent/index.js",
+      "types": "./dist/intent/index.d.ts"
+    },
+    "./context": {
+      "import": "./dist/context/index.mjs",
+      "require": "./dist/context/index.js",
+      "types": "./dist/context/index.d.ts"
+    },
+    "./handlers": {
+      "import": "./dist/handlers/index.mjs",
+      "require": "./dist/handlers/index.js",
+      "types": "./dist/handlers/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "zod": "^3.25.0"
+  },
+  "peerDependencies": {
+    "@ai-sdk/anthropic": ">=0.0.51",
+    "ai": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@ai-sdk/anthropic": {
+      "optional": true
+    },
+    "ai": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
