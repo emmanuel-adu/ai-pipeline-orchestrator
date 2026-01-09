@@ -9,7 +9,7 @@ function detectIntent(message: string, config: IntentConfig): IntentResult {
     score: number
     keywords: string[]
   }> = []
-  
+
   for (const { category, keywords } of patterns) {
     let score = 0
     const matchedKeywords: string[] = []
@@ -75,7 +75,7 @@ function detectIntent(message: string, config: IntentConfig): IntentResult {
  * Keyword-based intent classifier using pattern matching.
  * Fast and free - no LLM calls required.
  * Will fallback to LLM if confidence is low.
- * 
+ *
  */
 export class IntentClassifier {
   constructor(private config: IntentConfig) {}
@@ -89,9 +89,7 @@ export class IntentClassifier {
   }
 
   removePattern(category: string): void {
-    this.config.patterns = this.config.patterns.filter(
-      (p) => p.category !== category
-    )
+    this.config.patterns = this.config.patterns.filter(p => p.category !== category)
   }
 
   getPatterns(): IntentPattern[] {

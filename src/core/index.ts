@@ -1,8 +1,4 @@
-export {
-  executeOrchestration,
-  Orchestrator,
-  type OrchestratorConfig,
-} from './orchestrator'
+export { executeOrchestration, Orchestrator, type OrchestratorConfig } from './orchestrator'
 
 export type {
   Message,

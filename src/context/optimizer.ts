@@ -16,26 +16,24 @@ function buildContext(
   if (useFullContext) {
     selectedSections = sections
   } else {
-    selectedSections = sections.filter((section) => {
+    selectedSections = sections.filter(section => {
       if (section.alwaysInclude) return true
 
       if (!section.topics || section.topics.length === 0) return false
 
-      return section.topics.some((topic) => topics.includes(topic))
+      return section.topics.some(topic => topics.includes(topic))
     })
 
     selectedSections.sort((a, b) => (b.priority || 0) - (a.priority || 0))
   }
 
-  const systemPrompt = selectedSections
-    .map((section) => section.content)
-    .join('\n\n')
+  const systemPrompt = selectedSections.map(section => section.content).join('\n\n')
 
   const tokenEstimate = Math.ceil(systemPrompt.length / 4)
 
   return {
     systemPrompt,
-    sectionsIncluded: selectedSections.map((s) => s.id),
+    sectionsIncluded: selectedSections.map(s => s.id),
     tokenEstimate,
   }
 }
@@ -56,7 +54,7 @@ export class ContextOptimizer {
   }
 
   removeSection(id: string): void {
-    this.config.sections = this.config.sections.filter((s) => s.id !== id)
+    this.config.sections = this.config.sections.filter(s => s.id !== id)
   }
 
   getSections(): ContextSection[] {

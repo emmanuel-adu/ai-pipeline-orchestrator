@@ -1,6 +1,6 @@
 import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
-import { consoleLogger, type Logger } from '../utils/logger'
 import { createModel, type ProviderConfig } from '../providers'
+import { consoleLogger, type Logger } from '../utils/logger'
 
 export interface AIHandlerConfig extends ProviderConfig {
   maxTokens?: number
@@ -27,7 +27,7 @@ export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
 
       const systemPrompt = config.getSystemPrompt
         ? config.getSystemPrompt(context)
-        : (context.promptContext as { systemPrompt?: string })?.systemPrompt ?? ''
+        : ((context.promptContext as { systemPrompt?: string })?.systemPrompt ?? '')
 
       if (!systemPrompt) {
         logger.warn({}, 'No system prompt found, using empty prompt')
@@ -107,7 +107,7 @@ export function createStreamingAIHandler(config: StreamingAIHandlerConfig): Orch
 
       const systemPrompt = config.getSystemPrompt
         ? config.getSystemPrompt(context)
-        : (context.promptContext as { systemPrompt?: string })?.systemPrompt ?? ''
+        : ((context.promptContext as { systemPrompt?: string })?.systemPrompt ?? '')
 
       if (!systemPrompt) {
         logger.warn({}, 'No system prompt found, using empty prompt')

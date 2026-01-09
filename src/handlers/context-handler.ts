@@ -1,5 +1,5 @@
-import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
 import type { ContextOptimizer } from '../context/optimizer'
+import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
 import { consoleLogger, type Logger } from '../utils/logger'
 
 export interface ContextHandlerConfig {
@@ -13,9 +13,7 @@ export interface ContextHandlerConfig {
 /**
  * Creates context building handler for dynamic prompt generation.
  */
-export function createContextHandler(
-  config: ContextHandlerConfig
-): OrchestrationHandler {
+export function createContextHandler(config: ContextHandlerConfig): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
   const outputKey = config.outputKey ?? 'promptContext'
 

@@ -17,20 +17,23 @@
  * Run:
  *   npx tsx examples/chat-cli.ts
  */
+import { getProviderCredentials, getSimpleEnvConfig } from './utils'
+
 import 'dotenv/config'
+
 import * as readline from 'readline'
+
 import {
+  ContextOptimizer,
+  createContextHandler,
+  createIntentHandler,
+  createModerationHandler,
+  createStreamingAIHandler,
   executeOrchestration,
   IntentClassifier,
-  ContextOptimizer,
-  createModerationHandler,
-  createIntentHandler,
-  createContextHandler,
-  createStreamingAIHandler,
-  type OrchestrationContext,
   type Message,
+  type OrchestrationContext,
 } from '../src'
-import { getSimpleEnvConfig, getProviderCredentials } from './utils'
 
 const intentClassifier = new IntentClassifier({
   patterns: [
@@ -91,7 +94,7 @@ async function chat() {
   console.log('Type "exit" or "quit" to end the conversation\n')
 
   const prompt = () => {
-    rl.question('You: ', async (input) => {
+    rl.question('You: ', async input => {
       const userMessage = input.trim()
 
       if (!userMessage) {
@@ -134,7 +137,7 @@ async function chat() {
             name: 'context',
             handler: createContextHandler({
               optimizer: contextOptimizer,
-              getTopics: (ctx) => {
+              getTopics: ctx => {
                 const intent = ctx.intent as { intent?: string }
                 return intent?.intent ? [intent.intent] : []
               },
@@ -149,7 +152,7 @@ async function chat() {
               baseURL: aiConfig.baseURL,
               temperature: 0.7,
               maxTokens: 1024,
-              getSystemPrompt: (ctx) => {
+              getSystemPrompt: ctx => {
                 const promptContext = ctx.promptContext as { systemPrompt?: string }
                 const intent = ctx.intent as { metadata?: { tone?: string } }
 
@@ -161,7 +164,7 @@ async function chat() {
 
                 return systemPrompt
               },
-              onChunk: (chunk) => {
+              onChunk: chunk => {
                 process.stdout.write(chunk)
               },
             }),

@@ -1,6 +1,6 @@
 export interface Message {
   role: 'user' | 'assistant' | 'system' | 'tool'
-  content: string | Array<{type?: string; text?: string; [key: string]: unknown}>
+  content: string | Array<{ type?: string; text?: string; [key: string]: unknown }>
   [key: string]: unknown
 }
 
@@ -21,9 +21,7 @@ export interface OrchestrationContext {
   [key: string]: unknown
 }
 
-export type OrchestrationHandler = (
-  context: OrchestrationContext
-) => Promise<OrchestrationContext>
+export type OrchestrationHandler = (context: OrchestrationContext) => Promise<OrchestrationContext>
 
 export interface OrchestrationStep {
   name: string

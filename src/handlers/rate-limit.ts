@@ -19,9 +19,7 @@ export interface RateLimitHandlerConfig {
 /**
  * Creates rate limiting handler to prevent abuse.
  */
-export function createRateLimitHandler(
-  config: RateLimitHandlerConfig
-): OrchestrationHandler {
+export function createRateLimitHandler(config: RateLimitHandlerConfig): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
   const outputKey = config.outputKey ?? 'rateLimit'
 

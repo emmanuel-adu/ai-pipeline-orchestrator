@@ -1,6 +1,7 @@
 {
   "name": "ai-pipeline-orchestrator",
   "version": "0.1.0",
+  "type": "module",
   "description": "Production-ready orchestration framework for AI applications featuring hybrid intent classification, dynamic context optimization, and sequential pipeline architecture",
   "keywords": [
     "ai",
@@ -67,6 +68,11 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint src examples --ext .ts",
+    "lint:fix": "eslint src examples --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"examples/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"examples/**/*.ts\"",
+    "prepare": "husky",
     "prepublishOnly": "npm run typecheck && npm run build",
     "example:chat": "tsx examples/chat-cli.ts",
     "example:basic": "tsx examples/basic-chatbot.ts",
@@ -100,14 +106,28 @@
   "devDependencies": {
     "@ai-sdk/anthropic": "^3.0.9",
     "@ai-sdk/openai": "^1.2.2",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "ai": "^6.0.23",
     "dotenv": "^17.2.3",
+    "eslint": "^9.39.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "ollama-ai-provider": "^1.2.0",
+    "prettier": "^3.7.4",
     "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
     "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

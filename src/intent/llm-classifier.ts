@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { createModel, type ProviderConfig } from '../providers'
 
 export interface LLMClassifierConfig extends ProviderConfig {
@@ -26,7 +27,7 @@ async function classifyWithLLM(
     })
 
     const categoryList = config.categories
-      .map((cat) => `- ${cat}: ${config.categoryDescriptions[cat] || ''}`)
+      .map(cat => `- ${cat}: ${config.categoryDescriptions[cat] || ''}`)
       .join('\n')
 
     const prompt = config.promptTemplate

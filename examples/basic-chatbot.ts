@@ -1,10 +1,10 @@
 import {
+  ContextOptimizer,
+  createContextHandler,
+  createIntentHandler,
+  createModerationHandler,
   executeOrchestration,
   IntentClassifier,
-  ContextOptimizer,
-  createIntentHandler,
-  createContextHandler,
-  createModerationHandler,
   type OrchestrationContext,
 } from 'ai-pipeline-orchestrator'
 
@@ -69,7 +69,7 @@ async function main() {
       name: 'context',
       handler: createContextHandler({
         optimizer: contextOptimizer,
-        getTopics: (ctx) => {
+        getTopics: ctx => {
           const intent = ctx.intent as { metadata?: { topics?: string[] } }
           return intent?.metadata?.topics || []
         },

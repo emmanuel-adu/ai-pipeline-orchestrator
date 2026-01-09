@@ -18,14 +18,16 @@
  *   echo "AI_MODEL=llama3.2" >> .env
  *   echo "OLLAMA_BASE_URL=http://localhost:11434" >> .env
  */
+import { getProviderCredentials, getSimpleEnvConfig } from './utils'
+
 import 'dotenv/config'
+
 import {
-  executeOrchestration,
   createModerationHandler,
   createStreamingAIHandler,
+  executeOrchestration,
   type OrchestrationContext,
 } from '../src'
-import { getSimpleEnvConfig, getProviderCredentials } from './utils'
 
 async function main() {
   const { provider, model } = getSimpleEnvConfig()
@@ -33,9 +35,7 @@ async function main() {
 
   const context: OrchestrationContext = {
     request: {
-      messages: [
-        { role: 'user', content: 'Tell me a story about a robot' },
-      ],
+      messages: [{ role: 'user', content: 'Tell me a story about a robot' }],
     },
   }
 
@@ -53,8 +53,9 @@ async function main() {
         model: model as string,
         apiKey,
         baseURL,
-        getSystemPrompt: () => 'You are a creative storyteller. Keep your story brief (2-3 sentences).',
-        onChunk: (chunk) => {
+        getSystemPrompt: () =>
+          'You are a creative storyteller. Keep your story brief (2-3 sentences).',
+        onChunk: chunk => {
           process.stdout.write(chunk)
         },
       }),

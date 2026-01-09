@@ -18,18 +18,20 @@
  *   echo "AI_MODEL=llama3.2" >> .env
  *   echo "OLLAMA_BASE_URL=http://localhost:11434" >> .env
  */
+import { getProviderCredentials, getSimpleEnvConfig } from './utils'
+
 import 'dotenv/config'
+
 import {
+  ContextOptimizer,
+  createAIHandler,
+  createContextHandler,
+  createIntentHandler,
+  createModerationHandler,
   executeOrchestration,
   IntentClassifier,
-  ContextOptimizer,
-  createModerationHandler,
-  createIntentHandler,
-  createContextHandler,
-  createAIHandler,
   type OrchestrationContext,
 } from 'ai-pipeline-orchestrator'
-import { getSimpleEnvConfig, getProviderCredentials } from './utils'
 
 const intentClassifier = new IntentClassifier({
   patterns: [
@@ -103,7 +105,7 @@ async function main() {
         name: 'context',
         handler: createContextHandler({
           optimizer: contextOptimizer,
-          getTopics: (ctx) => {
+          getTopics: ctx => {
             const intent = ctx.intent as { intent?: string; metadata?: { tone?: string } }
             return intent?.intent ? [intent.intent] : []
           },
@@ -118,7 +120,7 @@ async function main() {
           baseURL,
           temperature: 0.7,
           maxTokens: 1024,
-          getSystemPrompt: (ctx) => {
+          getSystemPrompt: ctx => {
             const promptContext = ctx.promptContext as { systemPrompt?: string }
             const intent = ctx.intent as { metadata?: { tone?: string } }
 

@@ -23,21 +23,23 @@
  *   echo "ANTHROPIC_API_KEY=your-anthropic-key" >> .env
  *   echo "OPENAI_API_KEY=your-openai-key" >> .env
  */
+import { getEnvConfig, getProviderCredentials } from './utils'
+
 import 'dotenv/config'
+
 import {
+  ContextOptimizer,
+  createAIHandler,
+  createContextHandler,
+  createIntentHandler,
+  createModerationHandler,
+  createRateLimitHandler,
   executeOrchestration,
   IntentClassifier,
   LLMIntentClassifier,
-  ContextOptimizer,
-  createRateLimitHandler,
-  createModerationHandler,
-  createIntentHandler,
-  createContextHandler,
-  createAIHandler,
   type OrchestrationContext,
   type RateLimiter,
 } from '../src'
-import { getEnvConfig, getProviderCredentials } from './utils'
 
 // 1. Rate Limiter - Simple in-memory implementation (use Redis/Upstash in production)
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
@@ -201,7 +203,7 @@ async function main() {
         name: 'context',
         handler: createContextHandler({
           optimizer: contextOptimizer,
-          getTopics: (ctx) => {
+          getTopics: ctx => {
             const intent = ctx.intent as { intent?: string }
             return intent?.intent ? [intent.intent] : []
           },
@@ -216,7 +218,7 @@ async function main() {
           baseURL: aiConfig.baseURL,
           temperature: 0.7,
           maxTokens: 1024,
-          getSystemPrompt: (ctx) => {
+          getSystemPrompt: ctx => {
             const promptContext = ctx.promptContext as { systemPrompt?: string }
             const intent = ctx.intent as { metadata?: { tone?: string } }
 
@@ -242,7 +244,10 @@ async function main() {
 
   if (result.success) {
     console.log('Intent:', result.context.intent)
-    console.log('\nContext sections included:', (result.context.promptContext as any)?.sectionsIncluded)
+    console.log(
+      '\nContext sections included:',
+      (result.context.promptContext as any)?.sectionsIncluded
+    )
     console.log('\nAI Response:', (result.context.aiResponse as any)?.text)
     console.log('\nToken usage:', (result.context.aiResponse as any)?.usage)
   } else {

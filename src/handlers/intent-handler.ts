@@ -25,19 +25,17 @@ export interface IntentHandlerConfig {
 /**
  * Creates intent detection handler with hybrid classification.
  * Uses keyword matching first, falls back to LLM if confidence is low and LLM is enabled.
- * 
+ *
  * Keyword matching algorithm:
  * - Scoring: Each keyword match adds points equal to the keyword's word count.
  * - Single-word keywords (e.g., "hello") score 1 point
  * - Multi-word keywords (e.g., "help me") score 2 points
- * 
+ *
  * - Selection: The category with the highest score wins. Confidence is calculated as the margin between the best and second-best scores, normalized to 0-1.
- * 
+ *
  * Note: This is a simple heuristic. For production use, consider the LLM fallback option in createIntentHandler when confidence is low.
  */
-export function createIntentHandler(
-  config: IntentHandlerConfig
-): OrchestrationHandler {
+export function createIntentHandler(config: IntentHandlerConfig): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
   const confidenceThreshold = config.llmFallback?.confidenceThreshold ?? 0.5
   const contextKey = config.contextKey ?? 'intent'
@@ -61,17 +59,14 @@ export function createIntentHandler(
         ? lastMessage.content
         : Array.isArray(lastMessage.content)
           ? lastMessage.content
-              .map((part) => (typeof part === 'string' ? part : part.text || ''))
+              .map(part => (typeof part === 'string' ? part : part.text || ''))
               .join(' ')
           : ''
 
     try {
       const keywordResult = config.classifier.classify(content)
 
-      if (
-        keywordResult.confidence >= confidenceThreshold ||
-        !config.llmFallback?.enabled
-      ) {
+      if (keywordResult.confidence >= confidenceThreshold || !config.llmFallback?.enabled) {
         logger.debug(
           {
             intent: keywordResult.intent,

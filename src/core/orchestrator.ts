@@ -1,19 +1,11 @@
+import type { OrchestrationContext, OrchestrationResult, OrchestrationStep } from './types'
+
 import { consoleLogger, type Logger } from '../utils/logger'
-import type {
-  OrchestrationContext,
-  OrchestrationResult,
-  OrchestrationStep,
-} from './types'
 
 export interface OrchestratorConfig {
   logger?: Logger
   onStepComplete?: (step: string, durationMs: number) => void
-  onError?: (error: {
-    step: string
-    message: string
-    statusCode: number
-    details?: string
-  }) => void
+  onError?: (error: { step: string; message: string; statusCode: number; details?: string }) => void
   includeErrorDetails?: boolean
 }
 
@@ -123,7 +115,7 @@ export async function executeOrchestration(
     logger.info(
       {
         totalDurationMs: totalDuration,
-        stepsExecuted: steps.filter((s) => s.enabled !== false).length,
+        stepsExecuted: steps.filter(s => s.enabled !== false).length,
       },
       'AI orchestration completed successfully'
     )
@@ -179,11 +171,11 @@ export class Orchestrator {
   }
 
   removeHandler(name: string): void {
-    this.steps = this.steps.filter((s) => s.name !== name)
+    this.steps = this.steps.filter(s => s.name !== name)
   }
 
   toggleStep(name: string, enabled: boolean): void {
-    const step = this.steps.find((s) => s.name === name)
+    const step = this.steps.find(s => s.name === name)
     if (step) {
       step.enabled = enabled
     }

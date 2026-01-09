@@ -14,21 +14,16 @@ export interface ModerationConfig {
   logger?: Logger
 }
 
-const DEFAULT_SPAM_PATTERNS = [
-  /(.)\1{10,}/i,
-  /^[A-Z\s!]{20,}$/,
-]
+const DEFAULT_SPAM_PATTERNS = [/(.)\1{10,}/i, /^[A-Z\s!]{20,}$/]
 
 /**
  * Creates content moderation handler for spam and profanity filtering.
  */
-export function createModerationHandler(
-  config: ModerationConfig = {}
-): OrchestrationHandler {
+export function createModerationHandler(config: ModerationConfig = {}): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
   const outputKey = config.outputKey ?? 'contentModeration'
 
-  const spamPatterns = config.spamPatterns?.map((p) => new RegExp(p, 'i')) ?? DEFAULT_SPAM_PATTERNS
+  const spamPatterns = config.spamPatterns?.map(p => new RegExp(p, 'i')) ?? DEFAULT_SPAM_PATTERNS
   const profanityWords = config.profanityWords ?? []
   const customRules = config.customRules ?? []
 
@@ -50,7 +45,7 @@ export function createModerationHandler(
         ? lastMessage.content
         : Array.isArray(lastMessage.content)
           ? lastMessage.content
-              .map((part) => (typeof part === 'string' ? part : part.text || ''))
+              .map(part => (typeof part === 'string' ? part : part.text || ''))
               .join(' ')
           : ''
 
