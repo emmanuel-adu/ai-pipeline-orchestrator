@@ -3,6 +3,13 @@
  */
 import type { AIProvider } from '../src'
 
+const MODEL_EXAMPLES: Record<AIProvider, string[]> = {
+  anthropic: ["claude-3-5-haiku-20241022", "claude-3-5-sonnet-20241022"],
+  openai: ["gpt-4o-mini", "gpt-4o"],
+  deepseek: ["deepseek-chat"],
+  ollama: ['Run "ollama list" to see your installed models'],
+}
+
 export interface EnvConfig {
   aiProvider: AIProvider
   aiModel: string
@@ -32,10 +39,11 @@ export function getEnvConfig(): EnvConfig {
     console.log('Add to .env file with your chosen model:\n')
     console.log('  AI_MODEL=your-model-name\n')
     console.log('Examples by provider:')
-    console.log('  Anthropic: claude-3-5-haiku-20241022, claude-3-5-sonnet-20241022')
-    console.log('  OpenAI:    gpt-4o-mini, gpt-4o')
-    console.log('  DeepSeek:  deepseek-chat (cloud API)')
-    console.log('  Ollama:    Run "ollama list" to see your installed models\n')
+    Object.entries(MODEL_EXAMPLES).forEach(([provider, examples]) => {
+      const displayName = provider.charAt(0).toUpperCase() + provider.slice(1)
+      console.log(`  ${displayName}: ${examples.join(', ')}`)
+    })
+    console.log()
     process.exit(1)
   }
 
@@ -67,13 +75,28 @@ export function getProviderCredentials(provider: AIProvider): ProviderCredential
     }
   } else if (provider === 'deepseek') {
     apiKey = process.env.DEEPSEEK_API_KEY
+    baseURL = process.env.DEEPSEEK_BASE_URL
     if (!apiKey) {
       console.error('❌ Error: DEEPSEEK_API_KEY is required for DeepSeek provider')
       console.log('Add to .env file: DEEPSEEK_API_KEY=your-key\n')
       process.exit(1)
     }
+    if (!baseURL) {
+      console.error(
+        "❌ Error: DEEPSEEK_BASE_URL is required for DeepSeek provider"
+      );
+      console.log(
+        "Add to .env file: DEEPSEEK_BASE_URL=https://api.deepseek.com\n"
+      );
+      process.exit(1);
+    }
   } else if (provider === 'ollama') {
-    baseURL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'
+    baseURL = process.env.OLLAMA_BASE_URL;
+    if (!baseURL) {
+      console.error('❌ Error: OLLAMA_BASE_URL is required for Ollama provider')
+      console.log('Add to .env file: OLLAMA_BASE_URL=http://localhost:11434\n')
+      process.exit(1)
+    }
   }
 
   return { apiKey, baseURL }
@@ -98,12 +121,13 @@ export function getSimpleEnvConfig(): { provider: AIProvider; model: string } {
     console.log('Add to .env file with your chosen model:\n')
     console.log('  AI_MODEL=your-model-name\n')
     console.log('Examples by provider:')
-    console.log('  Anthropic: claude-3-5-haiku-20241022, claude-3-5-sonnet-20241022')
-    console.log('  OpenAI:    gpt-4o-mini, gpt-4o')
-    console.log('  DeepSeek:  deepseek-chat (cloud API)')
-    console.log('  Ollama:    Run "ollama list" to see your installed models\n')
+    Object.entries(MODEL_EXAMPLES).forEach(([provider, examples]) => {
+      const displayName = provider.charAt(0).toUpperCase() + provider.slice(1);
+      console.log(`  ${displayName}: ${examples.join(", ")}`);
+    });
+    console.log()
     process.exit(1)
-  }
+  };
 
-  return { provider, model: model as string }
+  return { provider, model: model as string };
 }

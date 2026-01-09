@@ -67,7 +67,12 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run typecheck && npm run build"
+    "prepublishOnly": "npm run typecheck && npm run build",
+    "example:chat": "tsx examples/chat-cli.ts",
+    "example:basic": "tsx examples/basic-chatbot.ts",
+    "example:complete": "tsx examples/complete-chatbot.ts",
+    "example:streaming": "tsx examples/streaming-chatbot.ts",
+    "example:all": "tsx examples/all-handlers.ts"
   },
   "dependencies": {
     "zod": "^3.25.0"
