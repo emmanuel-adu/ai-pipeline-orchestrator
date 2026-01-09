@@ -26,7 +26,7 @@ export async function executeOrchestration(
   steps: OrchestrationStep[],
   config?: OrchestratorConfig
 ): Promise<OrchestrationResult> {
-  const logger = config?.logger || consoleLogger
+  const logger = config?.logger ?? consoleLogger
   const includeErrorDetails = config?.includeErrorDetails ?? process.env.NODE_ENV !== 'production'
 
   let currentContext = { ...context }
@@ -167,7 +167,7 @@ export class Orchestrator {
 
   constructor(steps: OrchestrationStep[], config?: OrchestratorConfig) {
     this.steps = steps
-    this.config = config || {}
+    this.config = config ?? {}
   }
 
   async execute(context: OrchestrationContext): Promise<OrchestrationResult> {

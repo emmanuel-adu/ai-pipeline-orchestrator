@@ -22,12 +22,16 @@ export interface IntentHandlerConfig {
   logger?: Logger
 }
 
+/**
+ * Creates intent detection handler with hybrid classification.
+ * Uses keyword matching first, falls back to LLM if confidence is low.
+ */
 export function createIntentHandler(
   config: IntentHandlerConfig
 ): OrchestrationHandler {
-  const logger = config.logger || consoleLogger
+  const logger = config.logger ?? consoleLogger
   const confidenceThreshold = config.llmFallback?.confidenceThreshold ?? 0.5
-  const contextKey = config.contextKey || 'intent'
+  const contextKey = config.contextKey ?? 'intent'
 
   return async (context: OrchestrationContext) => {
     const messages = context.request.messages

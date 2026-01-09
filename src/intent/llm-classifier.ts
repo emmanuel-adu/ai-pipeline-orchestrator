@@ -64,6 +64,10 @@ User message: "${message}"
 Return the most likely intent, confidence (0-1), and brief reasoning.`
 }
 
+/**
+ * LLM-based intent classifier using Claude.
+ * More accurate than keyword matching but requires API calls.
+ */
 export class LLMIntentClassifier {
   constructor(private config: LLMClassifierConfig) {}
 

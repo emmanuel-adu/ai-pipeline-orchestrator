@@ -11,9 +11,13 @@ export interface AIHandlerConfig {
   logger?: Logger
 }
 
+/**
+ * Creates AI generation handler using Claude.
+ * Requires @ai-sdk/anthropic and ai packages.
+ */
 export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
-  const logger = config.logger || consoleLogger
-  const outputKey = config.outputKey || 'aiResponse'
+  const logger = config.logger ?? consoleLogger
+  const outputKey = config.outputKey ?? 'aiResponse'
 
   return async (context: OrchestrationContext) => {
     try {
@@ -22,7 +26,7 @@ export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
 
       const systemPrompt = config.getSystemPrompt
         ? config.getSystemPrompt(context)
-        : (context.promptContext as { systemPrompt?: string })?.systemPrompt || ''
+        : (context.promptContext as { systemPrompt?: string })?.systemPrompt ?? ''
 
       if (!systemPrompt) {
         logger.warn({}, 'No system prompt found, using empty prompt')

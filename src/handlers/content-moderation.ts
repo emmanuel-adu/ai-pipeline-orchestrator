@@ -19,15 +19,18 @@ const DEFAULT_SPAM_PATTERNS = [
   /^[A-Z\s!]{20,}$/,
 ]
 
+/**
+ * Creates content moderation handler for spam and profanity filtering.
+ */
 export function createModerationHandler(
   config: ModerationConfig = {}
 ): OrchestrationHandler {
-  const logger = config.logger || consoleLogger
-  const outputKey = config.outputKey || 'contentModeration'
+  const logger = config.logger ?? consoleLogger
+  const outputKey = config.outputKey ?? 'contentModeration'
 
-  const spamPatterns = config.spamPatterns?.map((p) => new RegExp(p, 'i')) || DEFAULT_SPAM_PATTERNS
-  const profanityWords = config.profanityWords || []
-  const customRules = config.customRules || []
+  const spamPatterns = config.spamPatterns?.map((p) => new RegExp(p, 'i')) ?? DEFAULT_SPAM_PATTERNS
+  const profanityWords = config.profanityWords ?? []
+  const customRules = config.customRules ?? []
 
   return async (context: OrchestrationContext) => {
     const messages = context.request.messages

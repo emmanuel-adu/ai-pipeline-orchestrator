@@ -74,6 +74,10 @@ function detectIntent(
   return result
 }
 
+/**
+ * Keyword-based intent classifier using pattern matching.
+ * Fast and free - no LLM calls required.
+ */
 export class IntentClassifier {
   constructor(private config: IntentConfig) {}
 

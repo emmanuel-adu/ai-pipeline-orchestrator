@@ -10,15 +10,18 @@ export interface ContextHandlerConfig {
   logger?: Logger
 }
 
+/**
+ * Creates context building handler for dynamic prompt generation.
+ */
 export function createContextHandler(
   config: ContextHandlerConfig
 ): OrchestrationHandler {
-  const logger = config.logger || consoleLogger
-  const outputKey = config.outputKey || 'promptContext'
+  const logger = config.logger ?? consoleLogger
+  const outputKey = config.outputKey ?? 'promptContext'
 
   return async (context: OrchestrationContext) => {
     try {
-      const topics = config.getTopics?.(context) || []
+      const topics = config.getTopics?.(context) ?? []
       const isFirstMessage =
         config.isFirstMessage?.(context) ?? context.request.messages.length === 1
 

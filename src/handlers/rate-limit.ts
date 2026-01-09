@@ -16,19 +16,22 @@ export interface RateLimitHandlerConfig {
   logger?: Logger
 }
 
+/**
+ * Creates rate limiting handler to prevent abuse.
+ */
 export function createRateLimitHandler(
   config: RateLimitHandlerConfig
 ): OrchestrationHandler {
-  const logger = config.logger || consoleLogger
-  const outputKey = config.outputKey || 'rateLimit'
+  const logger = config.logger ?? consoleLogger
+  const outputKey = config.outputKey ?? 'rateLimit'
 
   return async (context: OrchestrationContext) => {
     try {
       const identifier =
-        config.getIdentifier?.(context) ||
+        config.getIdentifier?.(context) ??
         (config.identifierKey
           ? (context.request.metadata?.[config.identifierKey] as string)
-          : undefined) ||
+          : undefined) ??
         'anonymous'
 
       const result = await config.limiter.check(identifier)

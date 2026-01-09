@@ -40,6 +40,10 @@ function buildContext(
   }
 }
 
+/**
+ * Dynamic context optimizer for token reduction.
+ * Selectively loads context sections based on topics and message position.
+ */
 export class ContextOptimizer {
   constructor(private config: ContextConfig) {}
 
