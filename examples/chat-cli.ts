@@ -30,6 +30,7 @@ import {
   type OrchestrationContext,
   type Message,
 } from '../src'
+import { getSimpleEnvConfig, getProviderCredentials } from './utils'
 
 const intentClassifier = new IntentClassifier({
   patterns: [
@@ -74,53 +75,8 @@ const contextOptimizer = new ContextOptimizer({
 })
 
 async function chat() {
-  const aiProvider = process.env.AI_PROVIDER as 'anthropic' | 'openai' | 'deepseek' | 'ollama'
-  const aiModel = process.env.AI_MODEL
-
-  if (!aiProvider || !aiModel) {
-    console.error('❌ Error: AI_PROVIDER and AI_MODEL are required\n')
-    console.log('Quick setup:')
-    console.log('  cp .env.example .env')
-    console.log('  # Edit .env with your provider and model\n')
-    console.log('Provider options: anthropic, openai, deepseek, ollama')
-    console.log('Model examples:')
-    console.log('  Anthropic: claude-3-5-haiku-20241022, claude-3-5-sonnet-20241022')
-    console.log('  OpenAI:    gpt-4o-mini, gpt-4o')
-    console.log('  DeepSeek:  deepseek-chat (cloud API)')
-    console.log('  Ollama:    Run "ollama list" to see your installed models\n')
-    process.exit(1)
-  }
-
-  const getProviderConfig = (provider: 'anthropic' | 'openai' | 'deepseek' | 'ollama') => {
-    let apiKey: string | undefined
-    let baseURL: string | undefined
-
-    if (provider === 'anthropic') {
-      apiKey = process.env.ANTHROPIC_API_KEY
-      if (!apiKey) {
-        console.error('❌ Error: ANTHROPIC_API_KEY is required')
-        process.exit(1)
-      }
-    } else if (provider === 'openai') {
-      apiKey = process.env.OPENAI_API_KEY
-      if (!apiKey) {
-        console.error('❌ Error: OPENAI_API_KEY is required')
-        process.exit(1)
-      }
-    } else if (provider === 'deepseek') {
-      apiKey = process.env.DEEPSEEK_API_KEY
-      if (!apiKey) {
-        console.error('❌ Error: DEEPSEEK_API_KEY is required')
-        process.exit(1)
-      }
-    } else if (provider === 'ollama') {
-      baseURL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'
-    }
-
-    return { apiKey, baseURL }
-  }
-
-  const aiConfig = getProviderConfig(aiProvider)
+  const { provider: aiProvider, model: aiModel } = getSimpleEnvConfig()
+  const aiConfig = getProviderCredentials(aiProvider)
 
   const messages: Message[] = []
 
