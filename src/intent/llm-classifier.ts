@@ -1,12 +1,11 @@
 import { z } from 'zod'
+import { createModel, type ProviderConfig } from '../providers'
 
-export interface LLMClassifierConfig {
-  model?: string
+export interface LLMClassifierConfig extends ProviderConfig {
   categories: string[]
   categoryDescriptions: Record<string, string>
   promptTemplate?: (message: string, categories: string, descriptions: string) => string
   temperature?: number
-  apiKey?: string
 }
 
 async function classifyWithLLM(
@@ -18,7 +17,6 @@ async function classifyWithLLM(
   reasoning?: string
 }> {
   try {
-    const { createAnthropic } = await import('@ai-sdk/anthropic')
     const { generateObject } = await import('ai')
 
     const schema = z.object({
@@ -35,10 +33,10 @@ async function classifyWithLLM(
       ? config.promptTemplate(message, config.categories.join(', '), categoryList)
       : buildDefaultPrompt(message, categoryList)
 
-    const anthropic = createAnthropic({ apiKey: config.apiKey })
+    const model = await createModel(config)
 
     const { object } = await generateObject({
-      model: anthropic(config.model || 'claude-3-5-haiku-20241022'),
+      model,
       schema,
       prompt,
       temperature: config.temperature ?? 0.3,
@@ -65,7 +63,7 @@ Return the most likely intent, confidence (0-1), and brief reasoning.`
 }
 
 /**
- * LLM-based intent classifier using Claude.
+ * LLM-based intent classifier.
  * More accurate than keyword matching but requires API calls.
  */
 export class LLMIntentClassifier {

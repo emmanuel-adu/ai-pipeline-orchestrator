@@ -47,6 +47,11 @@
       "import": "./dist/handlers/index.mjs",
       "require": "./dist/handlers/index.js"
     },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.mjs",
+      "require": "./dist/providers/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.mjs",
@@ -69,20 +74,30 @@
   },
   "peerDependencies": {
     "@ai-sdk/anthropic": ">=0.0.51",
-    "ai": ">=4.0.0"
+    "@ai-sdk/openai": ">=0.0.59",
+    "ai": ">=4.0.0",
+    "ollama-ai-provider": ">=0.16.1"
   },
   "peerDependenciesMeta": {
     "@ai-sdk/anthropic": {
       "optional": true
     },
+    "@ai-sdk/openai": {
+      "optional": true
+    },
     "ai": {
+      "optional": true
+    },
+    "ollama-ai-provider": {
       "optional": true
     }
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "^3.0.9",
+    "@ai-sdk/openai": "^1.2.2",
     "@types/node": "^20.0.0",
     "ai": "^6.0.23",
+    "ollama-ai-provider": "^0.16.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },

@@ -1,9 +1,8 @@
 import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
 import { consoleLogger, type Logger } from '../utils/logger'
+import { createModel, type ProviderConfig } from '../providers'
 
-export interface AIHandlerConfig {
-  model: string
-  apiKey?: string
+export interface AIHandlerConfig extends ProviderConfig {
   maxTokens?: number
   temperature?: number
   getSystemPrompt?: (context: OrchestrationContext) => string
@@ -12,8 +11,7 @@ export interface AIHandlerConfig {
 }
 
 /**
- * Creates AI generation handler using Claude.
- * Requires @ai-sdk/anthropic and ai packages.
+ * Creates AI generation handler.
  */
 export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
@@ -21,7 +19,6 @@ export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
 
   return async (context: OrchestrationContext) => {
     try {
-      const { createAnthropic } = await import('@ai-sdk/anthropic')
       const { generateText } = await import('ai')
 
       const systemPrompt = config.getSystemPrompt
@@ -32,10 +29,11 @@ export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
         logger.warn({}, 'No system prompt found, using empty prompt')
       }
 
-      const anthropic = createAnthropic({ apiKey: config.apiKey })
+      const model = await createModel(config)
 
       logger.debug(
         {
+          provider: config.provider,
           model: config.model,
           messageCount: context.request.messages.length,
         },
@@ -45,7 +43,7 @@ export function createAIHandler(config: AIHandlerConfig): OrchestrationHandler {
       const startTime = Date.now()
 
       const response = await generateText({
-        model: anthropic(config.model),
+        model,
         system: systemPrompt,
         messages: context.request.messages as any,
         ...(config.maxTokens && { maxTokens: config.maxTokens }),

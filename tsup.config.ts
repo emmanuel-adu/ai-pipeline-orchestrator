@@ -7,6 +7,7 @@ export default defineConfig({
     'intent/index': 'src/intent/index.ts',
     'context/index': 'src/context/index.ts',
     'handlers/index': 'src/handlers/index.ts',
+    'providers/index': 'src/providers/index.ts',
     'utils/index': 'src/utils/index.ts',
   },
   format: ['esm', 'cjs'],
@@ -16,6 +17,8 @@ export default defineConfig({
   clean: true,
   external: [
     '@ai-sdk/anthropic',
+    '@ai-sdk/openai',
+    'ollama-ai-provider',
     'ai',
     'zod',
   ],

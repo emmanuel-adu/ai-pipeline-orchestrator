@@ -7,7 +7,8 @@ Production-ready orchestration framework for AI applications featuring hybrid in
 - **Sequential Orchestration** - Map-based handler system with error propagation and performance monitoring
 - **Hybrid Intent Classification** - Fast keyword matching (free) with optional LLM fallback (accurate)
 - **Dynamic Context Optimization** - Smart context loading based on topics/intent (30-50% token reduction)
-- **Essential Handlers** - Rate limiting, content moderation, intent detection, context building
+- **Multi-Provider Support** - Works with Anthropic (Claude), OpenAI (GPT), or Ollama (local models)
+- **Essential Handlers** - Rate limiting, content moderation, intent detection, context building, AI generation
 - **Extensible** - Easy to add custom handlers and extend functionality
 - **TypeScript First** - Full type safety and IntelliSense support
 - **Minimal Dependencies** - Only Zod required, AI SDK is optional
@@ -18,10 +19,77 @@ Production-ready orchestration framework for AI applications featuring hybrid in
 npm install ai-pipeline-orchestrator
 ```
 
-Optional dependencies (for LLM features):
+Optional dependencies (install only the provider you need):
 
 ```bash
+# Anthropic (Claude)
 npm install @ai-sdk/anthropic ai
+
+# OpenAI (GPT)
+npm install @ai-sdk/openai ai
+
+# Ollama (Local models)
+npm install ollama-ai-provider ai
+```
+
+## Provider Configuration
+
+The package supports multiple LLM providers for intent classification and AI generation:
+
+### Anthropic (Claude)
+
+```typescript
+import { LLMIntentClassifier, createAIHandler } from 'ai-pipeline-orchestrator'
+
+const classifier = new LLMIntentClassifier({
+  provider: 'anthropic',
+  model: 'claude-3-5-haiku-20241022',
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  categories: ['greeting', 'help'],
+  categoryDescriptions: { greeting: 'User says hello', help: 'User needs help' },
+})
+
+const aiHandler = createAIHandler({
+  provider: 'anthropic',
+  model: 'claude-3-5-sonnet-20241022',
+  apiKey: process.env.ANTHROPIC_API_KEY,
+})
+```
+
+### OpenAI (GPT)
+
+```typescript
+const classifier = new LLMIntentClassifier({
+  provider: 'openai',
+  model: 'gpt-4o-mini',
+  apiKey: process.env.OPENAI_API_KEY,
+  categories: ['greeting', 'help'],
+  categoryDescriptions: { greeting: 'User says hello', help: 'User needs help' },
+})
+
+const aiHandler = createAIHandler({
+  provider: 'openai',
+  model: 'gpt-4o',
+  apiKey: process.env.OPENAI_API_KEY,
+})
+```
+
+### Ollama (Local Models)
+
+```typescript
+const classifier = new LLMIntentClassifier({
+  provider: 'ollama',
+  model: 'llama3.2',
+  baseURL: 'http://localhost:11434', // Optional, this is the default
+  categories: ['greeting', 'help'],
+  categoryDescriptions: { greeting: 'User says hello', help: 'User needs help' },
+})
+
+const aiHandler = createAIHandler({
+  provider: 'ollama',
+  model: 'llama3.2',
+  baseURL: 'http://localhost:11434', // Optional, this is the default
+})
 ```
 
 ## Quick Start
