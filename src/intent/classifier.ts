@@ -1,9 +1,6 @@
 import type { IntentConfig, IntentPattern, IntentResult } from './types'
 
-function detectIntent(
-  message: string,
-  config: IntentConfig
-): IntentResult {
+function detectIntent(message: string, config: IntentConfig): IntentResult {
   const lowerMessage = message.toLowerCase()
   const { patterns, metadata } = config
 
@@ -12,7 +9,7 @@ function detectIntent(
     score: number
     keywords: string[]
   }> = []
-
+  
   for (const { category, keywords } of patterns) {
     let score = 0
     const matchedKeywords: string[] = []
@@ -77,6 +74,8 @@ function detectIntent(
 /**
  * Keyword-based intent classifier using pattern matching.
  * Fast and free - no LLM calls required.
+ * Will fallback to LLM if confidence is low.
+ * 
  */
 export class IntentClassifier {
   constructor(private config: IntentConfig) {}

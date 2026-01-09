@@ -25,6 +25,15 @@ export interface IntentHandlerConfig {
 /**
  * Creates intent detection handler with hybrid classification.
  * Uses keyword matching first, falls back to LLM if confidence is low.
+ * 
+ * Keyword matching algorithm:
+ * - Scoring: Each keyword match adds points equal to the keyword's word count.
+ * - Single-word keywords (e.g., "hello") score 1 point
+ * - Multi-word keywords (e.g., "help me") score 2 points
+ * 
+ * - Selection: The category with the highest score wins. Confidence is calculated as the margin between the best and second-best scores, normalized to 0-1.
+ * 
+ * Note: This is a simple heuristic. For production use, consider the LLM fallback option in createIntentHandler when confidence is low.
  */
 export function createIntentHandler(
   config: IntentHandlerConfig
