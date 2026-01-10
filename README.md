@@ -5,8 +5,10 @@
 Build production-ready AI chatbots with composable handler pipelines. Handles intent detection, context optimization, token management, rate limiting, and moderation out of the box.
 
 [![npm version](https://img.shields.io/npm/v/ai-pipeline-orchestrator.svg)](https://www.npmjs.com/package/ai-pipeline-orchestrator)
+[![CI](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/workflows/CI/badge.svg)](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![npm downloads](https://img.shields.io/npm/dm/ai-pipeline-orchestrator.svg)](https://www.npmjs.com/package/ai-pipeline-orchestrator)
 
 </div>
 
