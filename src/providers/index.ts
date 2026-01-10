@@ -39,7 +39,7 @@ export async function createModel(config: ProviderConfig): Promise<any> {
     if (!config.baseURL) {
       throw new Error('baseURL is required for Ollama provider')
     }
-    const { createOllama } = await import('ollama-ai-provider')
+    const { createOllama } = await import('ai-sdk-ollama')
     const ollama = createOllama({
       baseURL: config.baseURL,
     })

@@ -44,7 +44,6 @@ import {
   type Message,
   type OrchestrationContext,
   type RateLimiter,
-  TextLLMIntentClassifier,
 } from '../src'
 
 // Silent logger for clean CLI output
@@ -402,11 +401,6 @@ function showMetadata(
     // AI SDK usage object - access nested properties
     const usage = aiResponse.usage
 
-    // Debug: log actual structure (remove after fixing)
-    if (process.env.DEBUG_TOKENS) {
-      console.log('DEBUG - Usage object:', JSON.stringify(usage, null, 2))
-    }
-
     // Handle both provider naming conventions:
     // - Anthropic: inputTokens, outputTokens, totalTokens
     // - OpenAI: promptTokens, completionTokens, totalTokens
@@ -464,24 +458,17 @@ async function chat() {
     general: "General conversation that doesn't fit other categories",
   }
 
-  const llmClassifier =
-    intentProvider === 'ollama'
-      ? new TextLLMIntentClassifier({
-          provider: intentProvider,
-          model: intentModel,
-          apiKey: intentConfig.apiKey,
-          baseURL: intentConfig.baseURL,
-          categories,
-          categoryDescriptions,
-        })
-      : new LLMIntentClassifier({
-          provider: intentProvider,
-          model: intentModel,
-          apiKey: intentConfig.apiKey,
-          baseURL: intentConfig.baseURL,
-          categories,
-          categoryDescriptions,
-        })
+  // Use LLMIntentClassifier for all providers (works with ollama-ai-provider-v2)
+  // Note: If using older Ollama models without structured output support,
+  // use TextLLMIntentClassifier instead
+  const llmClassifier = new LLMIntentClassifier({
+    provider: intentProvider,
+    model: intentModel,
+    apiKey: intentConfig.apiKey,
+    baseURL: intentConfig.baseURL,
+    categories,
+    categoryDescriptions,
+  })
 
   const messages: Message[] = []
 

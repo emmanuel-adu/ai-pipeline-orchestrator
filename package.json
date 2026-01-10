@@ -88,7 +88,7 @@
     "@ai-sdk/anthropic": ">=0.0.51",
     "@ai-sdk/openai": ">=0.0.59",
     "ai": ">=4.0.0",
-    "ollama-ai-provider": ">=1.0.0"
+    "ai-sdk-ollama": ">=1.0.0"
   },
   "peerDependenciesMeta": {
     "@ai-sdk/anthropic": {
@@ -100,7 +100,7 @@
     "ai": {
       "optional": true
     },
-    "ollama-ai-provider": {
+    "ai-sdk-ollama": {
       "optional": true
     }
   },
@@ -112,11 +112,11 @@
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "ai": "^6.0.23",
+    "ai-sdk-ollama": "^3.1.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "ollama-ai-provider": "^1.2.0",
     "prettier": "^3.7.4",
     "tsup": "^8.0.0",
     "tsx": "^4.0.0",

@@ -56,8 +56,8 @@ npm install @ai-sdk/anthropic ai
 # Or GPT
 npm install @ai-sdk/openai ai
 
-# Or local models
-npm install ollama-ai-provider ai
+# Or local models (built on official Ollama client)
+npm install ai-sdk-ollama ai
 ```
 
 ## Quick Start
@@ -111,9 +111,24 @@ type AIProvider = 'anthropic' | 'openai' | 'deepseek' | 'ollama'
 **Ollama (Local)** - `AI_PROVIDER=ollama`
 - Models: Run `ollama list` or `ollama pull deepseek-r1`
 - Free, runs locally. Get it at [ollama.com](https://ollama.com)
-- Optional: `OLLAMA_BASE_URL` (defaults to `http://localhost:11434`)
+- Uses: `ai-sdk-ollama` (built on official Ollama client)
+- Requires: `OLLAMA_BASE_URL=http://localhost:11434` (no `/api` - added automatically)
+- Features: Tool calling, web search, full AI SDK 5 support
 
 For local DeepSeek, use `AI_PROVIDER=ollama` with `AI_MODEL=deepseek-r1`.
+
+**💡 Hybrid Setup (Recommended):**
+Use cloud provider for chat (best quality) + Ollama for intent classification (free):
+
+```bash
+AI_PROVIDER=anthropic
+AI_MODEL=claude-3-5-haiku-20241022
+INTENT_PROVIDER=ollama
+INTENT_MODEL=deepseek-r1:latest
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+This gives you the best of both worlds: high-quality chat responses with zero-cost intent classification.
 
 ## How it works
 
@@ -211,6 +226,26 @@ const llmClassifier = new LLMIntentClassifier({
   },
 })
 ```
+
+**For Ollama** (free, local):
+
+```typescript
+import { LLMIntentClassifier } from 'ai-pipeline-orchestrator'
+
+const ollamaClassifier = new LLMIntentClassifier({
+  provider: 'ollama',
+  model: 'deepseek-r1:latest',
+  baseURL: 'http://localhost:11434', // No /api - added automatically
+  categories: ['greeting', 'help', 'question'],
+  categoryDescriptions: {
+    greeting: 'User says hello',
+    help: 'User needs help',
+    question: 'User asks a question',
+  },
+})
+```
+
+Works with `ai-sdk-ollama` which supports structured output for modern Ollama models.
 
 **Hybrid** (best of both):
 
@@ -391,7 +426,8 @@ if (result.success) {
 
 **Intent:**
 - `IntentClassifier` - Keyword-based detection
-- `LLMIntentClassifier` - LLM-based detection
+- `LLMIntentClassifier` - LLM-based detection (structured output)
+- `TextLLMIntentClassifier` - Text-based detection (for Ollama)
 - `createIntentHandler(config)` - Creates intent handler
 
 **Context:**
