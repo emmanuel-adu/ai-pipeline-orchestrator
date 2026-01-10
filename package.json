@@ -81,7 +81,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "changelog:init": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "prepare": "husky",
-    "prepublishOnly": "npm run lint && npm run typecheck && npm run test && npm run build && npm run changelog",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run test && npm run build",
     "example:chat": "tsx examples/chat-cli.ts",
     "example:basic": "tsx examples/basic-chatbot.ts",
     "example:complete": "tsx examples/complete-chatbot.ts",
