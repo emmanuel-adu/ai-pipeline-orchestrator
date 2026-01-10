@@ -1,4 +1,4 @@
-export type AIProvider = 'anthropic' | 'openai' | 'deepseek' | 'ollama'
+export type AIProvider = 'anthropic' | 'openai' | 'ollama'
 
 export interface ProviderConfig {
   provider: AIProvider
@@ -23,18 +23,6 @@ export async function createModel(config: ProviderConfig): Promise<any> {
     return openai(config.model)
   }
 
-  if (config.provider === 'deepseek') {
-    if (!config.baseURL) {
-      throw new Error('baseURL is required for DeepSeek provider')
-    }
-    const { createOpenAI } = await import('@ai-sdk/openai')
-    const deepseek = createOpenAI({
-      apiKey: config.apiKey,
-      baseURL: config.baseURL,
-    })
-    return deepseek(config.model)
-  }
-
   if (config.provider === 'ollama') {
     if (!config.baseURL) {
       throw new Error('baseURL is required for Ollama provider')
@@ -42,6 +30,7 @@ export async function createModel(config: ProviderConfig): Promise<any> {
     const { createOllama } = await import('ai-sdk-ollama')
     const ollama = createOllama({
       baseURL: config.baseURL,
+      ...(config.apiKey && { headers: { Authorization: `Bearer ${config.apiKey}` } }),
     })
     return ollama(config.model)
   }

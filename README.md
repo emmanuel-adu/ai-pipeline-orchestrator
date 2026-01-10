@@ -1,62 +1,36 @@
-# ai-pipeline-orchestrator
+# AI Pipeline Orchestrator
 
-Build production-ready AI chatbots with composable handler pipelines. Handles the messy parts: intent detection, context optimization, token management, rate limiting, and moderation.
+![Demo](./assets/demo.gif)
 
-## 🚀 Try the Demo
+Build production-ready AI chatbots with composable handler pipelines. Handles intent detection, context optimization, token management, rate limiting, and moderation out of the box.
 
-```bash
-# 1. Clone and install
-git clone https://github.com/emmanuel-adu/ai-pipeline-orchestrator.git
-cd ai-pipeline-orchestrator
-npm install
+## Features
 
-# 2. Configure your AI provider
-echo "AI_PROVIDER=anthropic" > .env
-echo "AI_MODEL=claude-3-5-haiku-20241022" >> .env
-echo "ANTHROPIC_API_KEY=your-key-here" >> .env
+| Feature | Description |
+|---------|-------------|
+| **Sequential Pipelines** | Compose handlers that run in order with automatic error handling |
+| **Hybrid Intent Detection** | Keyword matching (fast, free) → LLM fallback (accurate, paid) |
+| **Context Optimization** | Load only relevant context based on intent (30-50% token savings) |
+| **Multi-Provider** | Works with Anthropic, OpenAI, or Ollama (local/cloud) |
+| **Production Ready** | Rate limiting, moderation, logging, error handling built-in |
+| **TypeScript** | Full type safety with minimal dependencies (just Zod) |
 
-# 3. Run the interactive demo
-npm run example:chat
-```
-
-**Get API keys:** [Anthropic](https://console.anthropic.com) · [OpenAI](https://platform.openai.com) · [DeepSeek](https://platform.deepseek.com) · Or use [Ollama](https://ollama.com) (free, local)
-
-The demo showcases ALL features in real-time:
-- ✅ Content moderation
-- ✅ Rate limiting
-- ✅ Hybrid intent classification (keyword → LLM fallback)
-- ✅ Dynamic context optimization (30-50% token savings)
-- ✅ Multi-provider support
-- ✅ Real-time streaming
-- ✅ Token usage breakdown
-
----
-
-## What's Inside
-
-- **Sequential pipelines** - Compose handlers that run in order with automatic error handling
-- **Hybrid intent detection** - Keyword matching (fast, free) with optional LLM fallback
-- **Context optimization** - Load only relevant context based on intent, reduce tokens 30-50%
-- **Multi-provider** - Works with Claude, GPT, DeepSeek, or local Ollama models
-- **Production-ready** - Rate limiting, moderation, logging, error handling built-in
-- **TypeScript** - Full type safety with minimal dependencies (just Zod)
-
-## Install
+## Installation
 
 ```bash
 npm install ai-pipeline-orchestrator
 ```
 
-Then install a provider:
+Install a provider SDK:
 
 ```bash
-# Claude (recommended)
+# Anthropic (recommended)
 npm install @ai-sdk/anthropic ai
 
-# Or GPT
+# OpenAI
 npm install @ai-sdk/openai ai
 
-# Or local models (built on official Ollama client)
+# Ollama (free, local/cloud)
 npm install ai-sdk-ollama ai
 ```
 
@@ -65,83 +39,124 @@ npm install ai-sdk-ollama ai
 ```typescript
 import { executeOrchestration, createAIHandler } from 'ai-pipeline-orchestrator'
 
-const context = {
-  request: {
-    messages: [{ role: 'user', content: 'Tell me a joke' }],
-  },
-}
-
-const result = await executeOrchestration(context, [
+const result = await executeOrchestration(
   {
-    name: 'ai',
-    handler: createAIHandler({
-      provider: 'anthropic',
-      model: 'claude-3-5-haiku-20241022',
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      getSystemPrompt: () => 'You are a helpful assistant.',
-    }),
+    request: {
+      messages: [{ role: 'user', content: 'Tell me a joke' }],
+    },
   },
-])
+  [
+    {
+      name: 'ai',
+      handler: createAIHandler({
+        provider: 'anthropic',
+        model: 'claude-3-5-haiku-20241022',
+        apiKey: process.env.ANTHROPIC_API_KEY,
+        getSystemPrompt: () => 'You are a helpful assistant.',
+      }),
+    },
+  ]
+)
 
-if (result.success) {
-  console.log(result.context.aiResponse.text)
-}
+console.log(result.context.aiResponse.text)
 ```
 
 ## Providers
 
-Supports four providers via the `AIProvider` type:
+### Supported Providers
 
-```typescript
-type AIProvider = 'anthropic' | 'openai' | 'deepseek' | 'ollama'
-```
+| Provider | Package | Models | API Key | Best For |
+|----------|---------|--------|---------|----------|
+| **Anthropic** | `@ai-sdk/anthropic` | `claude-3-5-haiku-20241022`<br/>`claude-3-5-sonnet-20241022` | [Get key](https://console.anthropic.com) | Production, high-quality responses |
+| **OpenAI** | `@ai-sdk/openai` | `gpt-4o-mini`<br/>`gpt-4o` | [Get key](https://platform.openai.com) | Production, wide model selection |
+| **Ollama** | `ai-sdk-ollama` | `llama3.2`, `deepseek-r1`, `qwen2.5`<br/>100+ more | Optional ([Cloud](https://ollama.com)) | Development, cost savings, offline |
 
-**Claude (Anthropic)** - `AI_PROVIDER=anthropic`
-- Models: `claude-3-5-haiku-20241022`, `claude-3-5-sonnet-20241022`
-- Needs: `ANTHROPIC_API_KEY` from [console.anthropic.com](https://console.anthropic.com)
+### Provider Setup
 
-**GPT (OpenAI)** - `AI_PROVIDER=openai`
-- Models: `gpt-4o-mini`, `gpt-4o`
-- Needs: `OPENAI_API_KEY` from [platform.openai.com](https://platform.openai.com)
-
-**DeepSeek (Cloud)** - `AI_PROVIDER=deepseek`
-- Models: `deepseek-chat`
-- Needs: `DEEPSEEK_API_KEY` from [platform.deepseek.com](https://platform.deepseek.com)
-
-**Ollama (Local)** - `AI_PROVIDER=ollama`
-- Models: Run `ollama list` or `ollama pull deepseek-r1`
-- Free, runs locally. Get it at [ollama.com](https://ollama.com)
-- Uses: `ai-sdk-ollama` (built on official Ollama client)
-- Requires: `OLLAMA_BASE_URL=http://localhost:11434` (no `/api` - added automatically)
-- Features: Tool calling, web search, full AI SDK 5 support
-
-For local DeepSeek, use `AI_PROVIDER=ollama` with `AI_MODEL=deepseek-r1`.
-
-**💡 Hybrid Setup (Recommended):**
-Use cloud provider for chat (best quality) + Ollama for intent classification (free):
+<details>
+<summary><strong>Anthropic / OpenAI</strong></summary>
 
 ```bash
+# .env
 AI_PROVIDER=anthropic
 AI_MODEL=claude-3-5-haiku-20241022
+ANTHROPIC_API_KEY=your-key-here
+```
+
+</details>
+
+<details>
+<summary><strong>Ollama Local</strong></summary>
+
+```bash
+# Install and run
+curl -fsSL https://ollama.com/install.sh | sh
+ollama serve
+ollama pull llama3.2
+
+# .env
+AI_PROVIDER=ollama
+AI_MODEL=llama3.2:latest
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+</details>
+
+<details>
+<summary><strong>Ollama Cloud (Free Tier)</strong></summary>
+
+```bash
+# .env
+AI_PROVIDER=ollama
+AI_MODEL=llama3.2:latest
+OLLAMA_BASE_URL=https://ollama.com
+OLLAMA_API_KEY=your-key-here  # Get from https://ollama.com
+```
+
+</details>
+
+<details>
+<summary><strong>💡 Hybrid Setup (Recommended)</strong></summary>
+
+Use a cloud provider for chat (best quality) + Ollama for intent classification (free):
+
+```bash
+# .env
+AI_PROVIDER=anthropic
+AI_MODEL=claude-3-5-haiku-20241022
+ANTHROPIC_API_KEY=your-key-here
+
 INTENT_PROVIDER=ollama
 INTENT_MODEL=deepseek-r1:latest
 OLLAMA_BASE_URL=http://localhost:11434
 ```
 
-This gives you the best of both worlds: high-quality chat responses with zero-cost intent classification.
+This gives you high-quality chat responses with zero-cost intent classification.
 
-## How it works
+</details>
+
+## Usage
+
+### Pipeline Orchestration
 
 Handlers run sequentially, passing context between them:
 
 ```typescript
+import {
+  executeOrchestration,
+  createModerationHandler,
+  createIntentHandler,
+  createContextHandler,
+  createAIHandler,
+} from 'ai-pipeline-orchestrator'
+
 const result = await executeOrchestration(
   context,
   [
-    { name: 'moderation', handler: moderationHandler },
-    { name: 'intent', handler: intentHandler },
-    { name: 'context', handler: contextHandler },
-    { name: 'ai', handler: aiHandler },
+    { name: 'moderation', handler: createModerationHandler() },
+    { name: 'intent', handler: createIntentHandler({ classifier }) },
+    { name: 'context', handler: createContextHandler({ optimizer }) },
+    { name: 'ai', handler: createAIHandler({ provider, model, apiKey }) },
   ],
   {
     logger: myLogger,
@@ -152,46 +167,43 @@ const result = await executeOrchestration(
 
 If any handler sets `context.error` or throws, the pipeline stops.
 
-## Handlers
+### Handlers
 
-### Content moderation
+#### Content Moderation
 
 ```typescript
 import { createModerationHandler } from 'ai-pipeline-orchestrator'
 
 const handler = createModerationHandler({
   spamPatterns: ['buy now', 'click here'],
-  customRules: [
-    { pattern: /badword/i, reason: 'Profanity detected' },
-  ],
+  customRules: [{ pattern: /badword/i, reason: 'Profanity detected' }],
 })
 ```
 
-### Rate limiting
+#### Rate Limiting
 
 Bring your own rate limiter (Upstash, Redis, etc):
 
 ```typescript
-import { createRateLimitHandler, type RateLimiter } from 'ai-pipeline-orchestrator'
-
-const limiter: RateLimiter = {
-  check: async (id) => ({
-    allowed: await checkLimit(id),
-    retryAfter: 60, // seconds
-  }),
-}
+import { createRateLimitHandler } from 'ai-pipeline-orchestrator'
 
 const handler = createRateLimitHandler({
-  limiter,
-  identifierKey: 'userId', // which context field to check
+  limiter: {
+    check: async (id) => ({
+      allowed: await checkLimit(id),
+      retryAfter: 60, // seconds
+    }),
+  },
+  identifierKey: 'userId',
 })
 ```
 
-### Intent detection
+#### Intent Detection
 
-Three modes: keyword-only, LLM-only, or hybrid (keyword → LLM fallback).
+Three modes: keyword-only, LLM-only, or hybrid.
 
-**Keyword-based** (fast, free):
+<details>
+<summary><strong>Keyword-based</strong> (fast, free)</summary>
 
 ```typescript
 import { IntentClassifier, createIntentHandler } from 'ai-pipeline-orchestrator'
@@ -201,20 +213,20 @@ const classifier = new IntentClassifier({
     { category: 'greeting', keywords: ['hello', 'hi', 'hey'] },
     { category: 'help', keywords: ['help', 'support'] },
   ],
-  metadata: {
-    tones: { greeting: 'friendly', help: 'helpful' },
-  },
 })
 
 const handler = createIntentHandler({ classifier })
 ```
 
-**LLM-based** (accurate, paid):
+</details>
+
+<details>
+<summary><strong>LLM-based</strong> (accurate, paid)</summary>
 
 ```typescript
-import { LLMIntentClassifier } from 'ai-pipeline-orchestrator'
+import { LLMIntentClassifier, createIntentHandler } from 'ai-pipeline-orchestrator'
 
-const llmClassifier = new LLMIntentClassifier({
+const classifier = new LLMIntentClassifier({
   provider: 'anthropic',
   model: 'claude-3-5-haiku-20241022',
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -225,33 +237,18 @@ const llmClassifier = new LLMIntentClassifier({
     question: 'User asks a question',
   },
 })
+
+const handler = createIntentHandler({ classifier })
 ```
 
-**For Ollama** (free, local):
+</details>
 
-```typescript
-import { LLMIntentClassifier } from 'ai-pipeline-orchestrator'
-
-const ollamaClassifier = new LLMIntentClassifier({
-  provider: 'ollama',
-  model: 'deepseek-r1:latest',
-  baseURL: 'http://localhost:11434', // No /api - added automatically
-  categories: ['greeting', 'help', 'question'],
-  categoryDescriptions: {
-    greeting: 'User says hello',
-    help: 'User needs help',
-    question: 'User asks a question',
-  },
-})
-```
-
-Works with `ai-sdk-ollama` which supports structured output for modern Ollama models.
-
-**Hybrid** (best of both):
+<details>
+<summary><strong>Hybrid</strong> (best of both)</summary>
 
 ```typescript
 const handler = createIntentHandler({
-  classifier, // keyword first
+  classifier: keywordClassifier,
   llmFallback: {
     enabled: true,
     classifier: llmClassifier,
@@ -260,7 +257,9 @@ const handler = createIntentHandler({
 })
 ```
 
-### Context optimization
+</details>
+
+#### Context Optimization
 
 Load only relevant context based on intent:
 
@@ -277,32 +276,25 @@ const optimizer = new ContextOptimizer({
     {
       id: 'help',
       content: 'Help documentation...',
-      topics: ['help', 'support'], // include when intent matches
-    },
-    {
-      id: 'pricing',
-      content: 'Pricing info...',
-      topics: ['pricing', 'cost'],
+      topics: ['help', 'support'],
     },
   ],
   strategy: {
-    firstMessage: 'full',      // all sections for first message
-    followUp: 'selective',     // only relevant sections after
+    firstMessage: 'full',
+    followUp: 'selective',
   },
 })
 
 const handler = createContextHandler({
   optimizer,
-  getTopics: (ctx) => {
-    const intent = ctx.intent as { intent?: string }
-    return intent?.intent ? [intent.intent] : []
-  },
+  getTopics: (ctx) => [ctx.intent?.intent],
 })
 ```
 
-### AI generation
+#### AI Generation
 
-**Non-streaming:**
+<details>
+<summary><strong>Non-streaming</strong></summary>
 
 ```typescript
 import { createAIHandler } from 'ai-pipeline-orchestrator'
@@ -313,14 +305,14 @@ const handler = createAIHandler({
   apiKey: process.env.ANTHROPIC_API_KEY,
   temperature: 0.7,
   maxTokens: 1024,
-  getSystemPrompt: (ctx) => {
-    const promptCtx = ctx.promptContext as { systemPrompt?: string }
-    return promptCtx?.systemPrompt || 'You are a helpful assistant.'
-  },
+  getSystemPrompt: (ctx) => ctx.promptContext?.systemPrompt || 'You are a helpful assistant.',
 })
 ```
 
-**Streaming:**
+</details>
+
+<details>
+<summary><strong>Streaming</strong></summary>
 
 ```typescript
 import { createStreamingAIHandler } from 'ai-pipeline-orchestrator'
@@ -329,19 +321,16 @@ const handler = createStreamingAIHandler({
   provider: 'anthropic',
   model: 'claude-3-5-sonnet-20241022',
   apiKey: process.env.ANTHROPIC_API_KEY,
-  onChunk: (chunk) => {
-    // Send via SSE, WebSocket, etc
-    sendToClient(chunk)
-  },
+  onChunk: (chunk) => sendToClient(chunk),
 })
 
 // Full text still available after streaming
-if (result.success) {
-  console.log(result.context.aiResponse.text)
-}
+console.log(result.context.aiResponse.text)
 ```
 
-### Custom handlers
+</details>
+
+#### Custom Handlers
 
 ```typescript
 import { OrchestrationHandler } from 'ai-pipeline-orchestrator'
@@ -364,84 +353,81 @@ const authHandler: OrchestrationHandler = async (context) => {
 }
 ```
 
-## Full example
+## Try the Interactive Demo
 
-```typescript
-import {
-  executeOrchestration,
-  IntentClassifier,
-  ContextOptimizer,
-  createModerationHandler,
-  createIntentHandler,
-  createContextHandler,
-  createAIHandler,
-} from 'ai-pipeline-orchestrator'
+```bash
+git clone https://github.com/emmanuel-adu/ai-pipeline-orchestrator.git
+cd ai-pipeline-orchestrator
+npm install
 
-const intentClassifier = new IntentClassifier({
-  patterns: [
-    { category: 'greeting', keywords: ['hello', 'hi'] },
-    { category: 'help', keywords: ['help', 'support'] },
-  ],
-})
+# Configure (copy .env.example to .env and add your API key)
+cp .env.example .env
 
-const contextOptimizer = new ContextOptimizer({
-  sections: [
-    { id: 'core', content: 'You are a helpful assistant.', alwaysInclude: true },
-    { id: 'help', content: 'Help guide...', topics: ['help'] },
-  ],
-})
-
-const context = {
-  request: {
-    messages: [{ role: 'user', content: 'Hello!' }],
-  },
-}
-
-const result = await executeOrchestration(context, [
-  { name: 'moderation', handler: createModerationHandler() },
-  { name: 'intent', handler: createIntentHandler({ classifier: intentClassifier }) },
-  { name: 'context', handler: createContextHandler({ optimizer: contextOptimizer }) },
-  {
-    name: 'ai',
-    handler: createAIHandler({
-      provider: 'anthropic',
-      model: 'claude-3-5-haiku-20241022',
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    }),
-  },
-])
-
-if (result.success) {
-  console.log(result.context.aiResponse.text)
-}
+# Run the demo
+npm run example:chat
 ```
 
-## API
+The demo showcases all features in real-time:
+- Content moderation
+- Rate limiting
+- Hybrid intent classification
+- Context optimization (30-50% token savings)
+- Real-time streaming
+- Token usage breakdown
 
-**Core:**
-- `executeOrchestration(context, steps, config?)` - Run the pipeline
-- `Orchestrator` - Class-based version for stateful pipelines
-- `OrchestrationHandler` - Handler function type
-- `OrchestrationContext` - Context object passed between handlers
+## API Reference
 
-**Intent:**
-- `IntentClassifier` - Keyword-based detection
-- `LLMIntentClassifier` - LLM-based detection (structured output)
-- `TextLLMIntentClassifier` - Text-based detection (for Ollama)
-- `createIntentHandler(config)` - Creates intent handler
+### Core
 
-**Context:**
-- `ContextOptimizer` - Smart context selection
-- `createContextHandler(config)` - Creates context handler
+| Export | Description |
+|--------|-------------|
+| `executeOrchestration(context, steps, config?)` | Run the pipeline |
+| `Orchestrator` | Class-based version for stateful pipelines |
+| `OrchestrationHandler` | Handler function type |
+| `OrchestrationContext` | Context object passed between handlers |
 
-**AI:**
-- `createAIHandler(config)` - Text generation
-- `createStreamingAIHandler(config)` - Streaming generation
+### Intent
 
-**Utilities:**
-- `createRateLimitHandler(config)` - Rate limiting
-- `createModerationHandler(config)` - Content moderation
+| Export | Description |
+|--------|-------------|
+| `IntentClassifier` | Keyword-based detection |
+| `LLMIntentClassifier` | LLM-based detection with structured output |
+| `createIntentHandler(config)` | Creates intent handler |
+
+### Context
+
+| Export | Description |
+|--------|-------------|
+| `ContextOptimizer` | Smart context selection |
+| `createContextHandler(config)` | Creates context handler |
+
+### AI
+
+| Export | Description |
+|--------|-------------|
+| `createAIHandler(config)` | Text generation |
+| `createStreamingAIHandler(config)` | Streaming generation |
+
+### Utilities
+
+| Export | Description |
+|--------|-------------|
+| `createRateLimitHandler(config)` | Rate limiting |
+| `createModerationHandler(config)` | Content moderation |
+
+## Examples
+
+Check out the [examples](./examples) directory:
+
+- [`basic-chatbot.ts`](./examples/basic-chatbot.ts) - Minimal working example
+- [`complete-chatbot.ts`](./examples/complete-chatbot.ts) - All features combined
+- [`streaming-chatbot.ts`](./examples/streaming-chatbot.ts) - Streaming responses
+- [`chat-cli.ts`](./examples/chat-cli.ts) - Interactive CLI demo
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT
+MIT © [Emmanuel Adu](https://github.com/emmanuel-adu)

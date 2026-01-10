@@ -1,44 +1,32 @@
-# Changelog
+## 0.1.0 (2026-01-10)
 
-All notable changes to this project will be documented in this file.
+* Add AI generation capabilities with new AI handler, example implementation, and updates to package d ([e6ce00d](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/e6ce00d))
+* Add configuration files for editor, npm, and nvm; create CI and publish workflows; update package.js ([c2361c1](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/c2361c1))
+* Add content moderation, rate limiting, and context handling modules with respective configurations a ([f207aab](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/f207aab))
+* Add context management module with context building and optimization functionality ([023ec93](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/023ec93))
+* Add core orchestration module with orchestrator implementation and type definitions ([32b6400](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/32b6400))
+* Add example implementation for a basic chatbot using intent classification, context optimization, an ([61a4edb](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/61a4edb))
+* Add initial project structure with essential files ([6ddb8aa](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/6ddb8aa))
+* Add intent classification module with detectIntent and LLM classification functionality ([dbc8738](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/dbc8738))
+* add interactive chat CLI. ([a50e4f4](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/a50e4f4))
+* Add Prettier and ESLint configuration files, update package.json for linting and formatting scripts, ([d573b5d](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/d573b5d))
+* Add README.md with project overview, features, installation instructions, quick start guide, core co ([636e34b](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/636e34b))
+* Add streaming AI generation support ([a522b95](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/a522b95))
+* Add support for multiple AI providers by introducing a new provider configuration interface and mode ([e6d659e](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/e6d659e))
+* adjust package dependencies for ai-sdk-ollama. ([5dc6622](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/5dc6622))
+* adjust package.json for module exports and dependencies. ([e5e348e](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/e5e348e))
+* Cast model parameters to string in all handler examples for type consistency ([c10c6c3](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/c10c6c3))
+* Enhance documentation across various handlers and classifiers, adding descriptive comments for conte ([08c3a72](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/08c3a72))
+* Enhance intent detection documentation by detailing the keyword matching algorithm and scoring syste ([316f319](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/316f319))
+* Enhance support for DeepSeek provider by updating configuration instructions in .env.example, README ([73355e8](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/73355e8))
+* Introduce utility file in example folder ([5af9aa9](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/5af9aa9))
+* Refactor context and intent modules by removing unused exports and enhancing documentation. Update c ([fd14466](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/fd14466))
+* Refactor provider types to use AIProvider type across the codebase ([781f3a2](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/781f3a2))
+* Update .env.example and all-handlers.ts to improve environment variable configuration instructions a ([7db6923](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/7db6923))
+* Update .env.example and README to enhance provider configuration instructions; add dotenv dependency ([57a4193](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/57a4193))
+* Update .env.example, README, and examples to streamline provider configuration instructions and enha ([bec25c1](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/bec25c1))
+* Update dependencies for ollama-ai-provider and related packages to version 1.2.0. Improve documentat ([2d71dfe](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/2d71dfe))
+* Update README with comprehensive handler configuration guide ([cf76caf](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/cf76caf))
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2026-01-09
 
-### Added
-- Initial release of ai-pipeline-orchestrator
-- Sequential orchestration pipeline with error propagation
-- Hybrid intent classification (keyword → LLM fallback)
-- Dynamic context optimization for 30-50% token reduction
-- Multi-provider support (Anthropic, OpenAI, DeepSeek, Ollama)
-- Content moderation handler with pattern matching
-- Rate limiting handler with pluggable limiter interface
-- Streaming and non-streaming AI handlers
-- Interactive chat CLI demo showcasing all features
-- Full TypeScript support with exported types
-- ESM and CommonJS builds
-
-### Features
-- **IntentClassifier**: Fast, free keyword-based intent detection
-- **LLMIntentClassifier**: Accurate LLM-based classification with structured output
-- **TextLLMIntentClassifier**: Text-based classification for legacy models
-- **ContextOptimizer**: Smart context loading based on topics/intent
-- **Rate Limiting**: Pluggable interface for any rate limiting solution
-- **Content Moderation**: Pattern-based spam and profanity detection
-- **Streaming Support**: Real-time AI response streaming
-- **Token Tracking**: Detailed token usage breakdown across models
-
-### Supported Providers
-- Anthropic Claude (3.5 Haiku, 3.5 Sonnet)
-- OpenAI GPT (4o, 4o-mini)
-- DeepSeek (cloud API)
-- Ollama (local models via ai-sdk-ollama)
-
-### Dependencies
-- Zero production dependencies except Zod (validation)
-- Peer dependencies: AI SDK 5, provider packages (all optional)
-- Clean installation with no dependency conflicts
-
-[0.1.0]: https://github.com/emmanuel-adu/ai-pipeline-orchestrator/releases/tag/v0.1.0
