@@ -294,62 +294,42 @@ function showMetadata(
 ) {
   console.log()
   console.log(`${colors.dim}${'─'.repeat(70)}${colors.reset}`)
-  console.log(`${colors.gray}📊 Pipeline Results${colors.reset}`)
-  console.log()
 
-  // Handler 1: Content Moderation
-  console.log(`${colors.gray}   ${colors.green}✓${colors.reset} Content Moderation`)
-  if (moderation?.flagged) {
-    console.log(`${colors.gray}     ${colors.red}Flagged${colors.reset}: ${moderation.reason}`)
-  } else {
-    console.log(`${colors.gray}     ${colors.dim}No issues detected${colors.reset}`)
-  }
-  console.log()
-
-  // Handler 2: Rate Limiting
-  console.log(`${colors.gray}   ${colors.green}✓${colors.reset} Rate Limiting`)
+  // Single-line status indicators
+  const moderationStatus = moderation?.flagged
+    ? `${colors.red}⚠ Flagged${colors.reset}`
+    : `${colors.green}✓ Clean${colors.reset}`
   const requestsLeft = 10 - (rateLimit?.currentCount || 1)
-  console.log(`${colors.gray}     ${requestsLeft} requests remaining this minute${colors.reset}`)
-  console.log()
+  const rateLimitStatus = `${colors.green}✓${colors.reset} ${colors.dim}${requestsLeft} left${colors.reset}`
 
-  // Handler 3: Intent Classification
-  console.log(`${colors.gray}   ${colors.green}✓${colors.reset} Intent Detection`)
+  console.log(
+    `${colors.dim}Moderation: ${moderationStatus}  •  Rate Limit: ${rateLimitStatus}${colors.reset}`
+  )
+
+  // Intent on one line
   if (intent?.intent) {
-    const method = intent.method === 'llm' ? `🤖 ${intentProvider}/${intentModel}` : '⚡ Keyword'
+    const method = intent.method === 'llm' ? `🤖 ${intentModel}` : '⚡ Keyword'
+    const confidenceColor =
+      intent.confidence >= 0.7
+        ? colors.green
+        : intent.confidence >= 0.5
+          ? colors.yellow
+          : colors.red
+    const confidence =
+      intent.confidence !== undefined
+        ? ` ${confidenceColor}${(intent.confidence * 100).toFixed(0)}%${colors.reset}`
+        : ''
     console.log(
-      `${colors.gray}     Intent: ${colors.cyan}${intent.intent}${colors.reset} ${colors.dim}(${method})${colors.reset}`
+      `${colors.dim}Intent: ${colors.cyan}${intent.intent}${colors.reset} ${colors.dim}(${method})${confidence}${colors.reset}`
     )
-    if (intent.confidence !== undefined) {
-      const confidenceColor =
-        intent.confidence >= 0.7
-          ? colors.green
-          : intent.confidence >= 0.5
-            ? colors.yellow
-            : colors.red
-      console.log(
-        `${colors.gray}     Confidence: ${confidenceColor}${(intent.confidence * 100).toFixed(1)}%${colors.reset}`
-      )
-    }
-    // Show LLM reasoning if available
-    if (intent.method === 'llm' && intent.metadata?.reasoning) {
-      console.log(
-        `${colors.gray}     Reasoning: ${colors.dim}${intent.metadata.reasoning}${colors.reset}`
-      )
-    }
   }
-  console.log()
 
-  // Handler 4: Context Optimization
-  console.log(`${colors.gray}   ${colors.green}✓${colors.reset} Context Optimization`)
+  // Context optimization - compact
   if (promptContext?.sectionsIncluded?.length > 0) {
-    console.log(
-      `${colors.gray}     Loaded ${colors.cyan}${promptContext.sectionsIncluded.length}${colors.reset} of ${promptContext.totalSections || promptContext.sectionsIncluded.length} sections:`
-    )
-    promptContext.sectionsIncluded.forEach((section: string) => {
-      console.log(`${colors.gray}       • ${colors.dim}${section}${colors.reset}`)
-    })
+    const sections = promptContext.sectionsIncluded.join(', ')
+    let contextLine = `${colors.dim}Context: ${colors.cyan}${promptContext.sectionsIncluded.length}${colors.reset}${colors.dim}/${promptContext.totalSections || promptContext.sectionsIncluded.length} sections${colors.reset}`
 
-    // Calculate actual token savings (not section count)
+    // Token savings on same line
     if (promptContext.maxTokenEstimate && promptContext.tokenEstimate) {
       const maxTokens = promptContext.maxTokenEstimate
       const actualTokens = promptContext.tokenEstimate
@@ -357,83 +337,33 @@ function showMetadata(
 
       if (tokensSaved > 0) {
         const percentage = ((tokensSaved / maxTokens) * 100).toFixed(0)
-        console.log(
-          `${colors.gray}     ${colors.green}Saved ${percentage}%${colors.reset} ${colors.dim}(${actualTokens} tokens vs ${maxTokens} tokens if all loaded)${colors.reset}`
-        )
+        contextLine += ` ${colors.green}→ ${percentage}% saved${colors.reset} ${colors.dim}(${actualTokens}/${maxTokens} tokens)${colors.reset}`
       }
     }
+    console.log(contextLine)
   }
-  console.log()
 
-  // Handler 5: AI Generation
-  console.log(`${colors.gray}   ${colors.green}✓${colors.reset} AI Streaming Response`)
-
-  // Token usage breakdown
-  console.log(`${colors.gray}     Token Usage:${colors.reset}`)
-  console.log()
-
-  // Classification tokens - check method used, not token count
+  // Tokens - compact view with models
   const classificationMethod = intent?.method || 'keyword'
   const classificationTokens = intent?.llmTokens || intent?.usage?.totalTokens || 0
 
-  if (classificationMethod === 'llm') {
-    // LLM classification was used
-    console.log(
-      `${colors.gray}       Model 1 (Classification): ${colors.yellow}${intentProvider}/${intentModel}${colors.reset}`
-    )
-    console.log(
-      `${colors.gray}       └─ Tokens: ${colors.yellow}${classificationTokens}${colors.reset}`
-    )
-    console.log()
-  } else {
-    // Keyword matching was sufficient
-    console.log(
-      `${colors.gray}       Model 1 (Classification): ${colors.green}⚡ Keyword${colors.reset}`
-    )
-    console.log(
-      `${colors.gray}       └─ Tokens: ${colors.green}0${colors.reset} ${colors.dim}(free!)${colors.reset}`
-    )
-    console.log()
-  }
-
-  // Chat response tokens
   if (aiResponse?.usage) {
-    // AI SDK usage object - access nested properties
     const usage = aiResponse.usage
-
-    // Handle both provider naming conventions:
-    // - Anthropic: inputTokens, outputTokens, totalTokens
-    // - OpenAI: promptTokens, completionTokens, totalTokens
     const promptTokens = usage.promptTokens ?? usage.inputTokens ?? 0
     const completionTokens = usage.completionTokens ?? usage.outputTokens ?? 0
     const totalChatTokens = usage.totalTokens ?? promptTokens + completionTokens
-
-    // If we have a total but no breakdown, show total only
-    const hasBreakdown = promptTokens > 0 || completionTokens > 0
-
-    console.log(
-      `${colors.gray}       Model 2 (Chat): ${colors.blue}${aiProvider}/${aiModel}${colors.reset}`
-    )
-
-    if (hasBreakdown) {
-      console.log(`${colors.gray}       ├─ Input: ${colors.blue}${promptTokens}${colors.reset}`)
-      console.log(
-        `${colors.gray}       ├─ Output: ${colors.blue}${completionTokens}${colors.reset}`
-      )
-      console.log(
-        `${colors.gray}       └─ Subtotal: ${colors.blue}${totalChatTokens}${colors.reset}`
-      )
-    } else {
-      // Only total available (usage might still be a Promise)
-      console.log(
-        `${colors.gray}       └─ Tokens: ${colors.blue}${totalChatTokens}${colors.reset} ${colors.dim}(breakdown not available)${colors.reset}`
-      )
-    }
-    console.log()
-
-    // Grand total
     const grandTotal = classificationTokens + totalChatTokens
-    console.log(`${colors.gray}       ${colors.bright}Total: ${grandTotal} tokens${colors.reset}`)
+
+    // One line token summary with model info
+    let tokenLine = `${colors.dim}Tokens: ${colors.bright}${grandTotal}${colors.reset}`
+
+    if (classificationMethod === 'llm') {
+      tokenLine += ` ${colors.dim}(${colors.yellow}${classificationTokens}${colors.reset}${colors.dim} ${intentModel} + ${colors.blue}${totalChatTokens}${colors.reset}${colors.dim} ${aiModel})${colors.reset}`
+    } else {
+      tokenLine += ` ${colors.dim}(${colors.green}0${colors.reset}${colors.dim} keyword + ${colors.blue}${totalChatTokens}${colors.reset}${colors.dim} ${aiModel})${colors.reset}`
+    }
+
+    console.log(tokenLine)
   }
 
   console.log(`${colors.dim}${'─'.repeat(70)}${colors.reset}`)

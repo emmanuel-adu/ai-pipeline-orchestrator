@@ -1,6 +1,6 @@
 # AI Pipeline Orchestrator
 
-![Demo](./assets/demo.gif)
+![Demo](./assets/demo-image.png)
 
 Build production-ready AI chatbots with composable handler pipelines. Handles intent detection, context optimization, token management, rate limiting, and moderation out of the box.
 
