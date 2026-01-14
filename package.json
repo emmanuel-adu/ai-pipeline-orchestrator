@@ -86,7 +86,8 @@
     "example:basic": "tsx examples/basic-chatbot.ts",
     "example:complete": "tsx examples/complete-chatbot.ts",
     "example:streaming": "tsx examples/streaming-chatbot.ts",
-    "example:all": "tsx examples/all-handlers.ts"
+    "example:all": "tsx examples/all-handlers.ts",
+    "example:dynamic-context": "tsx examples/dynamic-context.ts"
   },
   "dependencies": {
     "zod": "^3.25.0"

@@ -153,13 +153,17 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
         'Intent detected via LLM fallback'
       )
 
+      // Look up metadata for the LLM's detected intent from keyword classifier config
+      // This ensures tones, deepLinks, and other metadata are preserved even when using LLM fallback
+      const llmIntentMetadata = config.classifier.getMetadataForIntent(llmResult.intent)
+
       return {
         ...context,
         [contextKey]: {
           intent: llmResult.intent,
           confidence: llmResult.confidence,
           metadata: {
-            ...keywordResult.metadata,
+            ...llmIntentMetadata,
             classificationMethod: 'llm',
             reasoning: llmResult.reasoning,
           },

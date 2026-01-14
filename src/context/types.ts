@@ -15,6 +15,7 @@ export interface ContextStrategy {
 export interface ContextConfig {
   sections: ContextSection[]
   strategy?: ContextStrategy
+  toneInstructions?: Record<string, string>
 }
 
 export interface ContextResult {

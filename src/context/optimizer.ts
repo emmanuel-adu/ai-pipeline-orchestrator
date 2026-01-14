@@ -3,9 +3,10 @@ import type { ContextConfig, ContextResult, ContextSection } from './types'
 function buildContext(
   topics: string[],
   isFirstMessage: boolean,
-  config: ContextConfig
+  config: ContextConfig,
+  tone?: string
 ): ContextResult {
-  const { sections, strategy } = config
+  const { sections, strategy, toneInstructions } = config
 
   const useFullContext =
     (isFirstMessage && strategy?.firstMessage !== 'selective') ||
@@ -27,7 +28,11 @@ function buildContext(
     selectedSections.sort((a, b) => (b.priority || 0) - (a.priority || 0))
   }
 
-  const systemPrompt = selectedSections.map(section => section.content).join('\n\n')
+  let systemPrompt = selectedSections.map(section => section.content).join('\n\n')
+
+  if (tone && toneInstructions?.[tone]) {
+    systemPrompt += '\n\n' + toneInstructions[tone]
+  }
 
   // Calculate token estimates
   const tokenEstimate = Math.ceil(systemPrompt.length / 4)
@@ -52,8 +57,8 @@ function buildContext(
 export class ContextOptimizer {
   constructor(private config: ContextConfig) {}
 
-  build(topics: string[], isFirstMessage: boolean): ContextResult {
-    return buildContext(topics, isFirstMessage, this.config)
+  build(topics: string[], isFirstMessage: boolean, tone?: string): ContextResult {
+    return buildContext(topics, isFirstMessage, this.config, tone)
   }
 
   addSection(section: ContextSection): void {

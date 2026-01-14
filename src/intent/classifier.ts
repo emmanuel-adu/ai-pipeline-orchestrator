@@ -95,4 +95,22 @@ export class IntentClassifier {
   getPatterns(): IntentPattern[] {
     return [...this.config.patterns]
   }
+
+  getMetadataForIntent(intent: string): Record<string, any> | undefined {
+    if (!this.config.metadata) return undefined
+
+    const metadata: Record<string, any> = {}
+
+    if (this.config.metadata.deepLinks?.[intent]) {
+      metadata.deepLink = this.config.metadata.deepLinks[intent]
+    }
+    if (this.config.metadata.tones?.[intent]) {
+      metadata.tone = this.config.metadata.tones[intent]
+    }
+    if (this.config.metadata.requiresAuth?.includes(intent)) {
+      metadata.requiresAuth = true
+    }
+
+    return Object.keys(metadata).length > 0 ? metadata : undefined
+  }
 }

@@ -30,10 +30,14 @@ Build production-ready AI chatbots with composable handler pipelines. Handles in
 | Feature | Description |
 |---------|-------------|
 | **Sequential Pipelines** | Compose handlers that run in order with automatic error handling |
-| **Hybrid Intent Detection** | Keyword matching (fast, free) → LLM fallback (accurate, paid) |
-| **Context Optimization** | Load only relevant context based on intent (30-50% token savings) |
+| **Hybrid Intent Detection** | Keyword matching (fast, free) -> LLM fallback (accurate, paid) |
+| **Context Optimization** | Load only relevant context based on intent (30-50% token savings) with automatic tone injection |
+| **Dynamic Context Loading** | Load contexts from database/CMS with caching and versioning |
+| **Real-Time Streaming** | Stream AI responses as they're generated for better UX |
+| **Token Usage Tracking** | Automatic token counting and usage breakdown for cost monitoring |
 | **Multi-Provider** | Works with Anthropic, OpenAI, or Ollama (local/cloud) |
-| **Production Ready** | Rate limiting, moderation, logging, error handling built-in |
+| **Production Ready** | Rate limiting, moderation, logging, error handling, analytics hooks, step performance tracking |
+| **Custom Handlers** | Build your own handlers with full TypeScript support |
 | **TypeScript** | Full type safety with minimal dependencies (just Zod) |
 
 ## Installation
@@ -188,6 +192,33 @@ const result = await executeOrchestration(
 
 If any handler sets `context.error` or throws, the pipeline stops.
 
+#### Class-based Orchestrator (for stateful pipelines)
+
+```typescript
+import { Orchestrator } from 'ai-pipeline-orchestrator'
+
+const orchestrator = new Orchestrator(
+  [
+    { name: 'moderation', handler: createModerationHandler() },
+    { name: 'intent', handler: createIntentHandler({ classifier }) },
+    { name: 'ai', handler: createAIHandler({ provider, model, apiKey }) },
+  ],
+  {
+    logger: myLogger,
+    onStepComplete: (step, duration) => console.log(`${step}: ${duration}ms`),
+  }
+)
+
+// Execute multiple times with same configuration
+const result1 = await orchestrator.execute(context1)
+const result2 = await orchestrator.execute(context2)
+
+// Dynamically manage handlers
+orchestrator.addHandler({ name: 'rateLimit', handler: createRateLimitHandler() })
+orchestrator.toggleStep('moderation', false) // Disable moderation
+orchestrator.removeHandler('intent') // Remove intent handler
+```
+
 ### Handlers
 
 #### Content Moderation
@@ -282,7 +313,11 @@ const handler = createIntentHandler({
 
 #### Context Optimization
 
-Load only relevant context based on intent:
+Context optimization automatically loads relevant context sections and injects tone-specific instructions based on detected intent.
+
+##### Static Context
+
+Load only relevant context based on intent with tone injection:
 
 ```typescript
 import { ContextOptimizer, createContextHandler } from 'ai-pipeline-orchestrator'
@@ -304,11 +339,67 @@ const optimizer = new ContextOptimizer({
     firstMessage: 'full',
     followUp: 'selective',
   },
+  toneInstructions: {
+    friendly: 'Be warm and approachable',
+    professional: 'Be formal and concise',
+  },
 })
 
 const handler = createContextHandler({
   optimizer,
   getTopics: (ctx) => [ctx.intent?.intent],
+  getTone: (ctx) => ctx.intent?.metadata?.tone, // Tone from intent metadata
+})
+```
+
+**How tone works:**
+- Intents can have associated tones (`greeting` -> `"Be warm, welcoming, and enthusiastic"`)
+- The tone is automatically injected into the system prompt via `toneInstructions`
+- This enables dynamic response customization without hardcoding tone in every prompt
+
+##### Dynamic Context
+
+Load context from database with versioning:
+
+```typescript
+import {
+  createDynamicContextHandler,
+  TTLCache,
+  type ContextLoader,
+} from 'ai-pipeline-orchestrator'
+
+// Implement your context loader
+class DatabaseContextLoader implements ContextLoader {
+  async load(topics: string[], variant?: string) {
+    const contexts = await db.contexts.findMany({
+      where: { variant, topics: { hasSome: topics } },
+    })
+    return contexts
+  }
+}
+
+// Setup cache with 5-minute TTL
+const cache = new TTLCache(5 * 60 * 1000)
+
+const handler = createDynamicContextHandler({
+  loader: new DatabaseContextLoader(),
+  cache,
+  getTopics: (ctx) => [ctx.intent?.intent],
+  getTone: (ctx) => ctx.intent?.metadata?.tone,
+  // Simple variant selection - bring your own A/B testing tool
+  getVariant: (ctx) => {
+    // Environment-based
+    return process.env.PROMPT_VARIANT
+
+    // Or use LaunchDarkly, Optimizely, etc.
+    // return launchDarkly.variation('prompt-version', ctx.userId, 'control')
+  },
+  onVariantUsed: (data) => {
+    // Track with your analytics tool
+    analytics.track('variant_used', data)
+  },
+  // Optional: fallback optimizer if loader fails
+  // fallbackOptimizer: optimizer,
 })
 ```
 
@@ -420,8 +511,12 @@ The demo showcases all features in real-time:
 
 | Export | Description |
 |--------|-------------|
-| `ContextOptimizer` | Smart context selection |
-| `createContextHandler(config)` | Creates context handler |
+| `ContextOptimizer` | Smart context selection (static) |
+| `createContextHandler(config)` | Creates context handler (static) |
+| `createDynamicContextHandler(config)` | Creates dynamic context handler with caching |
+| `ContextLoader` | Interface for loading contexts from external sources |
+| `StaticContextLoader` | Simple in-memory context loader |
+| `TTLCache` | Time-to-live cache utility |
 
 ### AI
 
@@ -444,7 +539,35 @@ Check out the [examples](./examples) directory:
 - [`basic-chatbot.ts`](./examples/basic-chatbot.ts) - Minimal working example
 - [`complete-chatbot.ts`](./examples/complete-chatbot.ts) - All features combined
 - [`streaming-chatbot.ts`](./examples/streaming-chatbot.ts) - Streaming responses
+- [`dynamic-context.ts`](./examples/dynamic-context.ts) - Dynamic context loading with versioning
+- [`all-handlers.ts`](./examples/all-handlers.ts) - Complete production pipeline
 - [`chat-cli.ts`](./examples/chat-cli.ts) - Interactive CLI demo
+
+### Running Examples
+
+Run any example using npm scripts:
+
+```bash
+# Interactive CLI demo (recommended for first-time users)
+npm run example:chat
+
+# Minimal working example
+npm run example:basic
+
+# Complete chatbot with all features
+npm run example:complete
+
+# Streaming responses
+npm run example:streaming
+
+# Dynamic context loading
+npm run example:dynamic-context
+
+# All handlers demonstration
+npm run example:all
+```
+
+Make sure you have your `.env` file configured with API keys before running examples.
 
 ### Demo Screenshots
 
