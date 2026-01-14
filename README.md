@@ -578,7 +578,7 @@ Make sure you have your `.env` file configured with API keys before running exam
   <img src="./assets/demo_image.png" alt="CLI Demo Screenshot" width="800">
 </p>
 
-*The interactive CLI displays real-time metadata including moderation status, rate limits, intent classification, context optimization savings, and token usage for full transparency.*
+*Interactive CLI showcasing hybrid intent detection (keyword → LLM fallback), context optimization with 30-74% token savings, tone injection, real-time streaming, and comprehensive metadata display after each response.*
 
 </details>
 
