@@ -1,6 +1,6 @@
 {
   "name": "ai-pipeline-orchestrator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Production-ready orchestration framework for AI applications featuring hybrid intent classification, dynamic context optimization, and sequential pipeline architecture",
   "keywords": [
