@@ -138,4 +138,132 @@ describe('IntentClassifier', () => {
       expect(result.confidence).toBe(0)
     })
   })
+
+  describe('getMetadataForIntent', () => {
+    it('should return tone metadata for an intent', () => {
+      const classifierWithMetadata = new IntentClassifier({
+        patterns: [
+          { category: 'greeting', keywords: ['hello'] },
+          { category: 'help', keywords: ['help'] },
+        ],
+        metadata: {
+          tones: {
+            greeting: 'Be warm and welcoming',
+            help: 'Be patient and helpful',
+          },
+        },
+      })
+
+      const greetingMetadata = classifierWithMetadata.getMetadataForIntent('greeting')
+      expect(greetingMetadata).toBeDefined()
+      expect(greetingMetadata?.tone).toBe('Be warm and welcoming')
+
+      const helpMetadata = classifierWithMetadata.getMetadataForIntent('help')
+      expect(helpMetadata).toBeDefined()
+      expect(helpMetadata?.tone).toBe('Be patient and helpful')
+    })
+
+    it('should return deepLink metadata for an intent', () => {
+      const classifierWithDeepLinks = new IntentClassifier({
+        patterns: [
+          { category: 'help', keywords: ['help'] },
+          { category: 'pricing', keywords: ['price', 'cost'] },
+        ],
+        metadata: {
+          deepLinks: {
+            help: '/help',
+            pricing: '/pricing',
+          },
+        },
+      })
+
+      const helpMetadata = classifierWithDeepLinks.getMetadataForIntent('help')
+      expect(helpMetadata).toBeDefined()
+      expect(helpMetadata?.deepLink).toBe('/help')
+
+      const pricingMetadata = classifierWithDeepLinks.getMetadataForIntent('pricing')
+      expect(pricingMetadata).toBeDefined()
+      expect(pricingMetadata?.deepLink).toBe('/pricing')
+    })
+
+    it('should return requiresAuth metadata for an intent', () => {
+      const classifierWithAuth = new IntentClassifier({
+        patterns: [
+          { category: 'account', keywords: ['account'] },
+          { category: 'public', keywords: ['info'] },
+        ],
+        metadata: {
+          requiresAuth: ['account'],
+        },
+      })
+
+      const accountMetadata = classifierWithAuth.getMetadataForIntent('account')
+      expect(accountMetadata).toBeDefined()
+      expect(accountMetadata?.requiresAuth).toBe(true)
+
+      const publicMetadata = classifierWithAuth.getMetadataForIntent('public')
+      expect(publicMetadata).toBeUndefined()
+    })
+
+    it('should return combined metadata for an intent', () => {
+      const classifierWithAllMetadata = new IntentClassifier({
+        patterns: [{ category: 'account', keywords: ['account'] }],
+        metadata: {
+          tones: {
+            account: 'Be professional and secure',
+          },
+          deepLinks: {
+            account: '/account',
+          },
+          requiresAuth: ['account'],
+        },
+      })
+
+      const metadata = classifierWithAllMetadata.getMetadataForIntent('account')
+      expect(metadata).toBeDefined()
+      expect(metadata?.tone).toBe('Be professional and secure')
+      expect(metadata?.deepLink).toBe('/account')
+      expect(metadata?.requiresAuth).toBe(true)
+    })
+
+    it('should return undefined for intent without metadata', () => {
+      const classifierWithMetadata = new IntentClassifier({
+        patterns: [
+          { category: 'greeting', keywords: ['hello'] },
+          { category: 'help', keywords: ['help'] },
+        ],
+        metadata: {
+          tones: {
+            greeting: 'Be warm',
+          },
+        },
+      })
+
+      const helpMetadata = classifierWithMetadata.getMetadataForIntent('help')
+      expect(helpMetadata).toBeUndefined()
+    })
+
+    it('should return undefined when no metadata config exists', () => {
+      const classifierNoMetadata = new IntentClassifier({
+        patterns: [{ category: 'greeting', keywords: ['hello'] }],
+      })
+
+      const metadata = classifierNoMetadata.getMetadataForIntent('greeting')
+      expect(metadata).toBeUndefined()
+    })
+
+    it('should return undefined for non-existent intent', () => {
+      const classifierWithMetadata = new IntentClassifier({
+        patterns: [{ category: 'greeting', keywords: ['hello'] }],
+        metadata: {
+          tones: {
+            greeting: 'Be warm',
+          },
+        },
+      })
+
+      const metadata = classifierWithMetadata.getMetadataForIntent('nonexistent')
+      expect(metadata).toBeUndefined()
+    })
+  })
 })

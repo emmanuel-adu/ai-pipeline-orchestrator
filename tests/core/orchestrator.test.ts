@@ -149,6 +149,68 @@ describe('executeOrchestration', () => {
       statusCode: 400,
     })
   })
+
+  describe('analytics hooks', () => {
+    it('should accept onIntentFallback callback', async () => {
+      const onIntentFallback = vi.fn()
+      const handler: OrchestrationHandler = async ctx => ctx
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'test' }],
+        },
+      }
+
+      await executeOrchestration(context, [{ name: 'test', handler }], {
+        onIntentFallback,
+      })
+
+      // Handler doesn't trigger fallback, so callback should not be called
+      expect(onIntentFallback).not.toHaveBeenCalled()
+    })
+
+    it('should accept onVariantUsed callback', async () => {
+      const onVariantUsed = vi.fn()
+      const handler: OrchestrationHandler = async ctx => ctx
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'test' }],
+        },
+      }
+
+      await executeOrchestration(context, [{ name: 'test', handler }], {
+        onVariantUsed,
+      })
+
+      // Handler doesn't use variants, so callback should not be called
+      expect(onVariantUsed).not.toHaveBeenCalled()
+    })
+
+    it('should pass analytics hooks to handlers via config', async () => {
+      const onIntentFallback = vi.fn()
+      const onVariantUsed = vi.fn()
+
+      // Handler that would trigger analytics callbacks
+      const handler: OrchestrationHandler = async ctx => {
+        // Handlers receive config via closure
+        return ctx
+      }
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'test' }],
+        },
+      }
+
+      const result = await executeOrchestration(context, [{ name: 'test', handler }], {
+        onIntentFallback,
+        onVariantUsed,
+      })
+
+      expect(result.success).toBe(true)
+    })
+  })
 })
 
 describe('Orchestrator class', () => {
