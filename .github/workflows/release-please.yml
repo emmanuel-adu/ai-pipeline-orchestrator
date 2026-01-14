@@ -18,5 +18,31 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT if available, otherwise fall back to GITHUB_TOKEN
+          # PAT allows PRs to trigger CI workflows
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
+
+      # Trigger CI workflow on the release-please branch if PR was created
+      - name: Trigger CI on release branch
+        if: steps.release.outputs.pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = ${{ steps.release.outputs.pr }};
+            if (pr) {
+              // Get the branch name from the PR
+              const { data: prData } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr
+              });
+
+              // Trigger workflow_dispatch on the branch
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'ci.yml',
+                ref: prData.head.ref
+              });
+            }
