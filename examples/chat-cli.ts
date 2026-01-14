@@ -4,13 +4,13 @@
  *
  * This is the COMPLETE showcase of ai-pipeline-orchestrator featuring:
  *
- * ✅ Content Moderation - Blocks spam and inappropriate content
- * ✅ Rate Limiting - Prevents abuse (demo: 10 requests/minute)
- * ✅ Hybrid Intent Classification - Keyword matching with LLM fallback
- * ✅ Dynamic Context Optimization - Loads only relevant context (30-50% token savings)
- * ✅ Multi-Provider Support - Works with Anthropic, OpenAI, Ollama
- * ✅ Real-Time Streaming - Fast, responsive AI responses
- * ✅ Token Usage Tracking - See exactly what you're using
+ * Content Moderation - Blocks spam and inappropriate content
+ * Rate Limiting - Prevents abuse (demo: 10 requests/minute)
+ * Hybrid Intent Classification - Keyword matching with LLM fallback
+ * Dynamic Context Optimization - Loads only relevant context (30-50% token savings)
+ * Multi-Provider Support - Works with Anthropic, OpenAI, Ollama
+ * Real-Time Streaming - Fast, responsive AI responses
+ * Token Usage Tracking - See exactly what you're using
  *
  * QUICK SETUP (30 seconds):
  *
@@ -89,6 +89,20 @@ const demoRateLimiter: RateLimiter = {
     return { allowed: true }
   },
 }
+
+// Analytics tracking for demonstration
+interface AnalyticsEvent {
+  type: 'intent_fallback'
+  data: {
+    message: string
+    keywordIntent: string
+    keywordConfidence: number
+    llmIntent: string
+    llmConfidence: number
+  }
+}
+
+let lastAnalyticsEvent: AnalyticsEvent | null = null
 
 // ANSI color codes
 const colors = {
@@ -186,6 +200,17 @@ const contextOptimizer = new ContextOptimizer({
     firstMessage: 'selective', // Only load relevant sections
     followUp: 'selective', // Optimize based on intent
   },
+  toneInstructions: {
+    'Be warm, welcoming, and enthusiastic': 'Use an upbeat and friendly tone',
+    'Be patient, clear, and provide actionable guidance':
+      'Be instructive and supportive with clear step-by-step guidance',
+    'Be friendly and leave a positive impression': 'End on a warm and positive note',
+    'Be informative and thorough in your explanation':
+      'Provide comprehensive answers with examples when helpful',
+    'Be appreciative and show you value their input':
+      'Express genuine appreciation for their feedback',
+    'Be helpful, friendly, and conversational': 'Keep the conversation natural and engaging',
+  },
 })
 
 function showHelp() {
@@ -279,6 +304,12 @@ function showHeader(aiProvider: string, aiModel: string, classifierProvider?: st
   )
   console.log(
     `   ${colors.green}✓${colors.reset} Context Optimization    ${colors.dim}30-50% token savings${colors.reset}`
+  )
+  console.log(
+    `   ${colors.green}✓${colors.reset} Tone Injection          ${colors.dim}intent-based response customization${colors.reset}`
+  )
+  console.log(
+    `   ${colors.green}✓${colors.reset} Analytics Tracking      ${colors.dim}intent fallback monitoring${colors.reset}`
   )
   console.log(
     `   ${colors.green}✓${colors.reset} Real-Time Streaming     ${colors.dim}fast, responsive AI responses${colors.reset}`
@@ -396,6 +427,29 @@ function showMetadata(
       lines.push(
         padLine(
           `${colors.dim}│${colors.reset} ${colors.bright}Context:${colors.reset}    ${sectionsText}`
+        )
+      )
+    }
+  }
+
+  // Tone injection
+  if (intent?.metadata?.tone) {
+    lines.push(
+      padLine(
+        `${colors.dim}│${colors.reset} ${colors.bright}Tone:${colors.reset}       ${colors.cyan}${intent.metadata.tone}${colors.reset} ${colors.dim}(applied to response)${colors.reset}`
+      )
+    )
+  }
+
+  // Analytics events
+  if (lastAnalyticsEvent) {
+    const event = lastAnalyticsEvent
+    if (event.type === 'intent_fallback') {
+      const keywordConf = (event.data.keywordConfidence * 100).toFixed(0)
+      const llmConf = (event.data.llmConfidence * 100).toFixed(0)
+      lines.push(
+        padLine(
+          `${colors.dim}│${colors.reset} ${colors.bright}Fallback:${colors.reset}   ${colors.yellow}⚡→🤖${colors.reset} ${colors.dim}keyword ${keywordConf}% → LLM ${llmConf}%${colors.reset}`
         )
       )
     }
@@ -551,6 +605,9 @@ async function chat() {
 
     let isFirstChunk = true
 
+    // Reset analytics tracking
+    lastAnalyticsEvent = null
+
     try {
       const result = await executeOrchestration(
         context,
@@ -606,6 +663,10 @@ async function chat() {
                 const intent = ctx.intent as { intent?: string }
                 return intent?.intent ? [intent.intent] : []
               },
+              getTone: ctx => {
+                const intent = ctx.intent as { metadata?: { tone?: string } }
+                return intent?.metadata?.tone
+              },
               logger: silentLogger,
             }),
           },
@@ -621,15 +682,7 @@ async function chat() {
               logger: silentLogger,
               getSystemPrompt: ctx => {
                 const promptContext = ctx.promptContext as { systemPrompt?: string }
-                const intent = ctx.intent as { metadata?: { tone?: string } }
-
-                let systemPrompt = promptContext?.systemPrompt || ''
-
-                if (intent?.metadata?.tone) {
-                  systemPrompt += `\n\nTone: ${intent.metadata.tone}`
-                }
-
-                return systemPrompt
+                return promptContext?.systemPrompt || ''
               },
               onChunk: chunk => {
                 // Clear spinner and "thinking" line on first chunk
@@ -647,6 +700,19 @@ async function chat() {
         ],
         {
           logger: silentLogger,
+          onIntentFallback: data => {
+            // Track when LLM fallback is triggered
+            lastAnalyticsEvent = {
+              type: 'intent_fallback',
+              data: {
+                message: data.message,
+                keywordIntent: data.keywordIntent,
+                keywordConfidence: data.keywordConfidence,
+                llmIntent: data.llmIntent,
+                llmConfidence: data.llmConfidence,
+              },
+            }
+          },
         }
       )
 

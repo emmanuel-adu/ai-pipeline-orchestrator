@@ -4,9 +4,12 @@
  * This example demonstrates all available handlers working together:
  * - Rate limiting
  * - Content moderation
- * - Intent detection (keyword + LLM fallback)
- * - Context optimization
+ * - Intent detection (keyword + LLM fallback with analytics)
+ * - Context optimization (static with tone injection)
  * - AI generation
+ *
+ * NOTE: This uses static context optimization. For dynamic context loading
+ * with A/B testing, see examples/dynamic-context.ts
  *
  * SETUP: Configure environment variables in .env file
  *
@@ -98,7 +101,7 @@ const intentClassifier = new IntentClassifier({
 
 // 4. LLM Fallback Classifier (configured in main based on provider)
 
-// 5. Context Optimizer
+// 5. Context Optimizer with Tone Injection
 const contextOptimizer = new ContextOptimizer({
   sections: [
     {
@@ -135,6 +138,14 @@ const contextOptimizer = new ContextOptimizer({
   strategy: {
     firstMessage: 'full',
     followUp: 'selective',
+  },
+  // Tone-specific instructions injected based on intent
+  toneInstructions: {
+    'Be warm and welcoming': '\n\nTONE: Use a warm, friendly tone with enthusiasm.',
+    'Be helpful and patient': '\n\nTONE: Be patient and thorough in your explanations.',
+    'Be clear about pricing': '\n\nTONE: Be clear and transparent about costs.',
+    'Be technical and solution-oriented':
+      '\n\nTONE: Focus on technical details and actionable solutions.',
   },
 })
 
@@ -197,6 +208,12 @@ async function main() {
             classifier: llmClassifier,
             confidenceThreshold: 0.5,
           },
+          onFallback: data => {
+            // Log intent fallback for learning
+            console.log(
+              `\n📊 Intent fallback triggered: ${data.keywordIntent} (${data.keywordConfidence.toFixed(2)}) → ${data.llmIntent} (${data.llmConfidence.toFixed(2)})`
+            )
+          },
         }),
       },
       {
@@ -206,6 +223,10 @@ async function main() {
           getTopics: ctx => {
             const intent = ctx.intent as { intent?: string }
             return intent?.intent ? [intent.intent] : []
+          },
+          getTone: ctx => {
+            const intent = ctx.intent as { metadata?: { tone?: string } }
+            return intent?.metadata?.tone
           },
         }),
       },
@@ -219,16 +240,9 @@ async function main() {
           temperature: 0.7,
           maxTokens: 1024,
           getSystemPrompt: ctx => {
+            // Context optimizer already includes tone injection
             const promptContext = ctx.promptContext as { systemPrompt?: string }
-            const intent = ctx.intent as { metadata?: { tone?: string } }
-
-            let systemPrompt = promptContext?.systemPrompt || ''
-
-            if (intent?.metadata?.tone) {
-              systemPrompt += `\n\nTone: ${intent.metadata.tone}`
-            }
-
-            return systemPrompt
+            return promptContext?.systemPrompt || ''
           },
         }),
       },

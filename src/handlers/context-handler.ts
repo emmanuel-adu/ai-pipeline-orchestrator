@@ -6,6 +6,7 @@ export interface ContextHandlerConfig {
   optimizer: ContextOptimizer
   getTopics?: (context: OrchestrationContext) => string[]
   isFirstMessage?: (context: OrchestrationContext) => boolean
+  getTone?: (context: OrchestrationContext) => string | undefined
   outputKey?: string
   logger?: Logger
 }
@@ -22,13 +23,15 @@ export function createContextHandler(config: ContextHandlerConfig): Orchestratio
       const topics = config.getTopics?.(context) ?? []
       const isFirstMessage =
         config.isFirstMessage?.(context) ?? context.request.messages.length === 1
+      const tone = config.getTone?.(context)
 
-      const result = config.optimizer.build(topics, isFirstMessage)
+      const result = config.optimizer.build(topics, isFirstMessage, tone)
 
       logger.debug(
         {
           topics,
           isFirstMessage,
+          tone,
           sectionsIncluded: result.sectionsIncluded,
           tokenEstimate: result.tokenEstimate,
         },

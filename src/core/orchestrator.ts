@@ -2,10 +2,26 @@ import type { OrchestrationContext, OrchestrationResult, OrchestrationStep } fro
 
 import { consoleLogger, type Logger } from '../utils/logger'
 
+export interface IntentFallbackData {
+  message: string
+  keywordIntent: string
+  keywordConfidence: number
+  llmIntent: string
+  llmConfidence: number
+  llmReasoning?: string
+}
+
+export interface VariantUsageData {
+  variant: string
+  topics: string[]
+}
+
 export interface OrchestratorConfig {
   logger?: Logger
   onStepComplete?: (step: string, durationMs: number) => void
   onError?: (error: { step: string; message: string; statusCode: number; details?: string }) => void
+  onIntentFallback?: (data: IntentFallbackData) => void
+  onVariantUsed?: (data: VariantUsageData) => void
   includeErrorDetails?: boolean
 }
 

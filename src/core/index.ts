@@ -1,4 +1,10 @@
-export { executeOrchestration, Orchestrator, type OrchestratorConfig } from './orchestrator'
+export {
+  executeOrchestration,
+  Orchestrator,
+  type OrchestratorConfig,
+  type IntentFallbackData,
+  type VariantUsageData,
+} from './orchestrator'
 
 export type {
   Message,
