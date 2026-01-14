@@ -29,20 +29,38 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = ${{ steps.release.outputs.pr }};
-            if (pr) {
-              // Get the branch name from the PR
-              const { data: prData } = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr
-              });
+            const prOutput = '${{ steps.release.outputs.pr }}';
+            if (!prOutput) return;
 
-              // Trigger workflow_dispatch on the branch
-              await github.rest.actions.createWorkflowDispatch({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'ci.yml',
-                ref: prData.head.ref
-              });
+            // Parse PR number - handle both JSON object and direct number
+            let prNumber;
+            try {
+              const parsed = JSON.parse(prOutput);
+              // If it's an object, extract the PR number
+              prNumber = typeof parsed === 'object' && parsed !== null
+                ? (parsed.number || parsed.pr || parsed.pull_number || parsed)
+                : parsed;
+            } catch {
+              // If not JSON, treat as direct PR number
+              prNumber = parseInt(prOutput, 10);
             }
+
+            if (!prNumber || isNaN(prNumber)) {
+              console.log('Could not extract PR number from:', prOutput);
+              return;
+            }
+
+            // Get the branch name from the PR
+            const { data: prData } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            // Trigger workflow_dispatch on the branch
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci.yml',
+              ref: prData.head.ref
+            });
