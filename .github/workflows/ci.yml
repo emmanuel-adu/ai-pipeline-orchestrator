@@ -6,7 +6,9 @@ on:
       - main
       - 'release-please--**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - 'release-please--**'
 
 jobs:
   lint:
