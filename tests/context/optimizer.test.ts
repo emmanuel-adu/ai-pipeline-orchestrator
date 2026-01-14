@@ -190,4 +190,131 @@ describe('ContextOptimizer', () => {
       expect(greetingIndex).toBeLessThan(technicalIndex)
     })
   })
+
+  describe('tone injection', () => {
+    it('should inject tone instructions when tone is provided', () => {
+      const optimizerWithTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'You are a helpful assistant.',
+            alwaysInclude: true,
+          },
+        ],
+        toneInstructions: {
+          friendly: 'Be warm and conversational.',
+          professional: 'Be formal and precise.',
+        },
+      })
+
+      const result = optimizerWithTones.build([], true, 'friendly')
+
+      expect(result.systemPrompt).toContain('You are a helpful assistant.')
+      expect(result.systemPrompt).toContain('Be warm and conversational.')
+    })
+
+    it('should not inject tone when tone is not provided', () => {
+      const optimizerWithTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'You are a helpful assistant.',
+            alwaysInclude: true,
+          },
+        ],
+        toneInstructions: {
+          friendly: 'Be warm and conversational.',
+        },
+      })
+
+      const result = optimizerWithTones.build([], true)
+
+      expect(result.systemPrompt).toContain('You are a helpful assistant.')
+      expect(result.systemPrompt).not.toContain('Be warm and conversational.')
+    })
+
+    it('should not inject tone when tone does not exist in config', () => {
+      const optimizerWithTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'You are a helpful assistant.',
+            alwaysInclude: true,
+          },
+        ],
+        toneInstructions: {
+          friendly: 'Be warm and conversational.',
+        },
+      })
+
+      const result = optimizerWithTones.build([], true, 'nonexistent')
+
+      expect(result.systemPrompt).toContain('You are a helpful assistant.')
+      expect(result.systemPrompt).not.toContain('Be warm and conversational.')
+    })
+
+    it('should work without toneInstructions config', () => {
+      const optimizerNoTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'You are a helpful assistant.',
+            alwaysInclude: true,
+          },
+        ],
+      })
+
+      const result = optimizerNoTones.build([], true, 'friendly')
+
+      expect(result.systemPrompt).toBe('You are a helpful assistant.')
+    })
+
+    it('should append tone after section content', () => {
+      const optimizerWithTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'Core instructions.',
+            alwaysInclude: true,
+          },
+          {
+            id: 'greeting',
+            content: 'Greeting instructions.',
+            topics: ['greeting'],
+          },
+        ],
+        toneInstructions: {
+          friendly: 'Tone instructions.',
+        },
+      })
+
+      const result = optimizerWithTones.build(['greeting'], true, 'friendly')
+
+      const promptParts = result.systemPrompt.split('\n\n')
+      expect(promptParts).toHaveLength(3)
+      expect(promptParts[0]).toBe('Core instructions.')
+      expect(promptParts[1]).toBe('Greeting instructions.')
+      expect(promptParts[2]).toBe('Tone instructions.')
+    })
+
+    it('should increase token estimate when tone is injected', () => {
+      const optimizerWithTones = new ContextOptimizer({
+        sections: [
+          {
+            id: 'core',
+            content: 'Core instructions.',
+            alwaysInclude: true,
+          },
+        ],
+        toneInstructions: {
+          friendly: 'Be warm and conversational with users.',
+        },
+      })
+
+      const withoutTone = optimizerWithTones.build([], true)
+      const withTone = optimizerWithTones.build([], true, 'friendly')
+
+      expect(withTone.tokenEstimate).toBeGreaterThan(withoutTone.tokenEstimate)
+    })
+  })
 })

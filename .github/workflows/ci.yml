@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - 'release-please--**'
   pull_request:
     branches:
       - main
-      - 'release-please--**'
 
 jobs:
   lint:
