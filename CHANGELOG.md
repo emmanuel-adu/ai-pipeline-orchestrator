@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.2.0...ai-pipeline-orchestrator-v0.3.0) (2026-01-15)
+
+
+### Features
+
+* **adapters:** add Upstash and Prisma context loaders with testing utilities ([ccdb202](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/ccdb20231bfd031877aaf958be2659d479a2b846))
+* **conditions:** add conditional execution helpers and integrate with orchestrator ([5489d95](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/5489d95e3a74dfb2cc079241039b84445dc9b143))
+* **moderation:** enhance content moderation handler to support string and RegExp patterns ([8bfeb15](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/8bfeb1531db029e224ace4cd6a4254c7e16ca8b9))
+* **parallel-execution:** implement parallel execution in orchestration pipeline ([7614d06](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/7614d0671e763cf5357d56cf6da7cfe1deb11aeb))
+
 ## [0.2.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.1.0...ai-pipeline-orchestrator-v0.2.0) (2026-01-14)
 
 
