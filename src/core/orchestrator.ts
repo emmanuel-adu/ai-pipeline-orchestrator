@@ -55,6 +55,14 @@ export async function executeOrchestration(
         continue
       }
 
+      if (step.shouldExecute) {
+        const shouldRun = await step.shouldExecute(currentContext)
+        if (!shouldRun) {
+          logger.debug({ step: step.name }, 'Skipping step based on shouldExecute condition')
+          continue
+        }
+      }
+
       const stepStartTime = Date.now()
 
       try {

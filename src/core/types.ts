@@ -30,6 +30,7 @@ export interface OrchestrationStep {
   name: string
   handler: OrchestrationHandler
   enabled?: boolean
+  shouldExecute?: (context: OrchestrationContext) => boolean | Promise<boolean>
 }
 
 export interface OrchestrationResult {
