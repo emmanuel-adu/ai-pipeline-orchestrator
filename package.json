@@ -57,6 +57,21 @@
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.mjs",
       "require": "./dist/utils/index.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.mjs",
+      "require": "./dist/testing/index.cjs"
+    },
+    "./adapters/upstash": {
+      "types": "./dist/adapters/upstash.d.ts",
+      "import": "./dist/adapters/upstash.mjs",
+      "require": "./dist/adapters/upstash.cjs"
+    },
+    "./adapters/prisma": {
+      "types": "./dist/adapters/prisma.d.ts",
+      "import": "./dist/adapters/prisma.mjs",
+      "require": "./dist/adapters/prisma.cjs"
     }
   },
   "files": [
@@ -96,7 +111,10 @@
     "@ai-sdk/anthropic": ">=0.0.51",
     "@ai-sdk/openai": ">=0.0.59",
     "ai": ">=4.0.0",
-    "ai-sdk-ollama": ">=1.0.0"
+    "ai-sdk-ollama": ">=1.0.0",
+    "@upstash/ratelimit": ">=2.0.0",
+    "@upstash/redis": ">=1.0.0",
+    "@prisma/client": ">=5.0.0"
   },
   "peerDependenciesMeta": {
     "@ai-sdk/anthropic": {
@@ -109,6 +127,15 @@
       "optional": true
     },
     "ai-sdk-ollama": {
+      "optional": true
+    },
+    "@upstash/ratelimit": {
+      "optional": true
+    },
+    "@upstash/redis": {
+      "optional": true
+    },
+    "@prisma/client": {
       "optional": true
     }
   },

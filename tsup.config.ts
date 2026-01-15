@@ -9,6 +9,9 @@ export default defineConfig({
     'handlers/index': 'src/handlers/index.ts',
     'providers/index': 'src/providers/index.ts',
     'utils/index': 'src/utils/index.ts',
+    'testing/index': 'src/testing/index.ts',
+    'adapters/upstash': 'src/adapters/upstash-ratelimit.ts',
+    'adapters/prisma': 'src/adapters/prisma-context.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -18,5 +21,14 @@ export default defineConfig({
   outExtension: ({ format }) => ({
     js: format === 'esm' ? '.mjs' : '.cjs',
   }),
-  external: ['@ai-sdk/anthropic', '@ai-sdk/openai', 'ollama-ai-provider', 'ai', 'zod'],
+  external: [
+    '@ai-sdk/anthropic',
+    '@ai-sdk/openai',
+    'ollama-ai-provider',
+    'ai',
+    'zod',
+    '@upstash/ratelimit',
+    '@upstash/redis',
+    '@prisma/client',
+  ],
 })

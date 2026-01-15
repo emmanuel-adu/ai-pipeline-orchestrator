@@ -1,20 +1,22 @@
 import type { ContextSection } from './types'
 
-/**
- * Interface for loading context sections dynamically.
- * Implementations can load from database, file system, or any other source.
- */
-export interface ContextLoader {
-  load(topics: string[], variant?: string): Promise<ContextSection[]>
+export interface ContextLoadOptions {
+  topics?: string[]
+  variant?: string
+  isFirstMessage?: boolean
+  userId?: string
+  sessionId?: string
+  metadata?: Record<string, unknown>
 }
 
-/**
- * Simple in-memory context loader for testing or static contexts.
- */
+export interface ContextLoader {
+  load(options: ContextLoadOptions): Promise<ContextSection[]>
+}
+
 export class StaticContextLoader implements ContextLoader {
   constructor(private sections: ContextSection[]) {}
 
-  async load(_topics: string[], _variant?: string): Promise<ContextSection[]> {
+  async load(_options: ContextLoadOptions): Promise<ContextSection[]> {
     return this.sections
   }
 }

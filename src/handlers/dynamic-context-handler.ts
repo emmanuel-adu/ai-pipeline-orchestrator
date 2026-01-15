@@ -19,8 +19,7 @@ export interface DynamicContextHandlerConfig {
 }
 
 /**
- * Creates dynamic context handler with caching support.
- * Loads context sections dynamically from a ContextLoader implementation.
+ * Creates dynamic context handler with caching support
  */
 export function createDynamicContextHandler(
   config: DynamicContextHandlerConfig
@@ -60,11 +59,11 @@ export function createDynamicContextHandler(
         if (config.cache) {
           const cacheKey = `${variant || 'default'}`
           sections = await config.cache.getOrLoad(cacheKey, () =>
-            config.loader.load(topics, variant)
+            config.loader.load({ topics, variant, isFirstMessage })
           )
           logger.debug({ cacheKey, sectionCount: sections.length }, 'Loaded from cache')
         } else {
-          sections = await config.loader.load(topics, variant)
+          sections = await config.loader.load({ topics, variant, isFirstMessage })
           logger.debug({ sectionCount: sections.length }, 'Loaded sections')
         }
       } catch (error) {

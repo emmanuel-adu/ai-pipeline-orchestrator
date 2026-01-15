@@ -1,5 +1,5 @@
 export { ContextOptimizer } from './optimizer'
 export type { ContextSection, ContextStrategy, ContextConfig, ContextResult } from './types'
-export type { ContextLoader } from './loader'
+export type { ContextLoader, ContextLoadOptions } from './loader'
 export { StaticContextLoader } from './loader'
 export { TTLCache } from './cache'

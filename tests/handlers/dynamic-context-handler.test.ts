@@ -32,7 +32,7 @@ describe('createDynamicContextHandler', () => {
   ]
 
   const mockLoader: ContextLoader = {
-    load: vi.fn(async () => mockSections),
+    load: vi.fn(async _options => mockSections),
   }
 
   it('should load contexts dynamically', async () => {
@@ -55,7 +55,7 @@ describe('createDynamicContextHandler', () => {
 
   it('should use cache when provided', async () => {
     const cache = new TTLCache<ContextSection[]>(60000)
-    const loadSpy = vi.fn(async () => mockSections)
+    const loadSpy = vi.fn(async _options => mockSections)
     const loaderWithSpy: ContextLoader = {
       load: loadSpy,
     }
@@ -81,8 +81,8 @@ describe('createDynamicContextHandler', () => {
   })
 
   it('should support variant selection', async () => {
-    const loadSpy = vi.fn(async (topics: string[], variant?: string) => {
-      if (variant === 'variant-a') {
+    const loadSpy = vi.fn(async options => {
+      if (options.variant === 'variant-a') {
         return [{ id: 'a', name: 'A', content: 'Variant A', alwaysInclude: true, priority: 10 }]
       }
       return [{ id: 'b', name: 'B', content: 'Variant B', alwaysInclude: true, priority: 10 }]
@@ -105,7 +105,7 @@ describe('createDynamicContextHandler', () => {
 
     const result = await handler(context)
 
-    expect(loadSpy).toHaveBeenCalledWith([], 'variant-a')
+    expect(loadSpy).toHaveBeenCalledWith({ topics: [], variant: 'variant-a', isFirstMessage: true })
     expect((result.promptContext as any).systemPrompt).toContain('Variant A')
     expect((result.promptContext as any).variant).toBe('variant-a')
   })
@@ -134,7 +134,7 @@ describe('createDynamicContextHandler', () => {
   })
 
   it('should pass topics to loader', async () => {
-    const loadSpy = vi.fn(async () => mockSections)
+    const loadSpy = vi.fn(async _options => mockSections)
     const loaderWithSpy: ContextLoader = {
       load: loadSpy,
     }
@@ -152,7 +152,11 @@ describe('createDynamicContextHandler', () => {
 
     await handler(context)
 
-    expect(loadSpy).toHaveBeenCalledWith(['greeting', 'help'], undefined)
+    expect(loadSpy).toHaveBeenCalledWith({
+      topics: ['greeting', 'help'],
+      variant: undefined,
+      isFirstMessage: true,
+    })
   })
 
   it('should filter sections based on topics for follow-up messages', async () => {
@@ -207,7 +211,7 @@ describe('createDynamicContextHandler', () => {
     ]
 
     const loaderWithPriority: ContextLoader = {
-      load: async () => sectionsWithPriority,
+      load: async _options => sectionsWithPriority,
     }
 
     const handler = createDynamicContextHandler({
@@ -249,7 +253,7 @@ describe('createDynamicContextHandler', () => {
 
   it('should handle loader errors gracefully', async () => {
     const failingLoader: ContextLoader = {
-      load: async () => {
+      load: async _options => {
         throw new Error('Database connection failed')
       },
     }

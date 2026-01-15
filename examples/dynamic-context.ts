@@ -27,6 +27,7 @@ import 'dotenv/config'
 
 import {
   type ContextLoader,
+  type ContextLoadOptions,
   type ContextSection,
   createAIHandler,
   createDynamicContextHandler,
@@ -57,13 +58,12 @@ import {
  * ```
  */
 class DatabaseContextLoader implements ContextLoader {
-  async load(_topics: string[], variant?: string): Promise<ContextSection[]> {
-    // Simulate database latency
+  async load(options: ContextLoadOptions): Promise<ContextSection[]> {
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    console.log(`📦 Loading contexts from database for variant: ${variant}`)
+    console.log(`📦 Loading contexts from database for variant: ${options.variant}`)
 
-    if (variant === 'variant-a') {
+    if (options.variant === 'variant-a') {
       // Variant A: Casual, friendly tone
       return [
         {
