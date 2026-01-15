@@ -2,12 +2,12 @@ import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
 import { consoleLogger, type Logger } from '../utils/logger'
 
 export interface ModerationRule {
-  pattern: RegExp
+  pattern: string | RegExp
   reason: string
 }
 
 export interface ModerationConfig {
-  spamPatterns?: string[]
+  spamPatterns?: Array<string | RegExp>
   profanityWords?: string[]
   customRules?: ModerationRule[]
   outputKey?: string
@@ -23,9 +23,15 @@ export function createModerationHandler(config: ModerationConfig = {}): Orchestr
   const logger = config.logger ?? consoleLogger
   const outputKey = config.outputKey ?? 'contentModeration'
 
-  const spamPatterns = config.spamPatterns?.map(p => new RegExp(p, 'i')) ?? DEFAULT_SPAM_PATTERNS
+  const spamPatterns =
+    config.spamPatterns?.map(p => (typeof p === 'string' ? new RegExp(p, 'i') : p)) ??
+    DEFAULT_SPAM_PATTERNS
   const profanityWords = config.profanityWords ?? []
-  const customRules = config.customRules ?? []
+  const customRules =
+    config.customRules?.map(rule => ({
+      ...rule,
+      pattern: typeof rule.pattern === 'string' ? new RegExp(rule.pattern, 'i') : rule.pattern,
+    })) ?? []
 
   return async (context: OrchestrationContext) => {
     const messages = context.request.messages

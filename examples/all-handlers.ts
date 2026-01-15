@@ -70,13 +70,21 @@ const rateLimiter: RateLimiter = {
   },
 }
 
-// 2. Content Moderation
+// 2. Content Moderation - Supports both string and RegExp patterns
 const moderationHandler = createModerationHandler({
-  spamPatterns: ['buy now', 'click here', 'limited time offer'],
+  // Strings are automatically converted to case-insensitive RegExp
+  spamPatterns: ['buy now', 'click here', 'limited time offer', /\d{10,}/],
+  profanityWords: ['badword1', 'badword2'],
   customRules: [
     {
+      // Can use RegExp for complex patterns
       pattern: /\b(spam|scam)\b/i,
       reason: 'Potential spam content',
+    },
+    {
+      // Or strings for simple patterns
+      pattern: 'urgent action required',
+      reason: 'Urgency manipulation',
     },
   ],
 })
