@@ -1,3 +1,21 @@
+# Changelog
+
+## [0.2.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.1.0...ai-pipeline-orchestrator-v0.2.0) (2026-01-14)
+
+
+### Features
+
+* **context:** add dynamic context loading with tone injection and caching ([d5c717f](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/d5c717feccd3557b0a16fd468a6bdde01a1556a1))
+* **test:** integrate Vitest for testing with test cases ([08922aa](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/08922aac7adff9f45a8fd9793c8e4b4d81b9a90f))
+
+
+### Documentation
+
+* **readme:** add CI and npm downloads badges to README ([d836dbe](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/d836dbe49181e32cf716be22f8885651e8b6c44f))
+* **readme:** add image of cli output ([55fc099](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/55fc09905f1f35a398ab72e731f8afdf0be076f1))
+* **readme:** enhance README with demo images, CLI output details, and improved formatting ([6f26292](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/6f26292862427b77417e6a69993738deff393878))
+* **readme:** update CLI description ([bce7bad](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/bce7bad7d374ccb6ee02facfe43e643060e9510e))
+
 ## 0.1.0 (2026-01-10)
 
 * Add AI generation capabilities with new AI handler, example implementation, and updates to package d ([e6ce00d](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/e6ce00d))
@@ -27,6 +45,3 @@
 * Update .env.example, README, and examples to streamline provider configuration instructions and enha ([bec25c1](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/bec25c1))
 * Update dependencies for ollama-ai-provider and related packages to version 1.2.0. Improve documentat ([2d71dfe](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/2d71dfe))
 * Update README with comprehensive handler configuration guide ([cf76caf](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/cf76caf))
-
-
-
