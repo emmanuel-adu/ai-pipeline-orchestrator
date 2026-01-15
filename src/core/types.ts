@@ -33,6 +33,8 @@ export interface OrchestrationStep {
   shouldExecute?: (context: OrchestrationContext) => boolean | Promise<boolean>
 }
 
+export type OrchestrationSteps = Array<OrchestrationStep | OrchestrationStep[]>
+
 export interface OrchestrationResult {
   success: boolean
   context: OrchestrationContext

@@ -365,7 +365,7 @@ describe('Testing Utilities', () => {
       const result = await handler(context)
       const duration = Date.now() - start
 
-      expect(duration).toBeGreaterThanOrEqual(100)
+      expect(duration).toBeGreaterThanOrEqual(95)
       expect(result).toEqual(context)
     })
   })

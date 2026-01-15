@@ -11,5 +11,6 @@ export type {
   OrchestrationContext,
   OrchestrationHandler,
   OrchestrationStep,
+  OrchestrationSteps,
   OrchestrationResult,
 } from './types'
