@@ -15,14 +15,14 @@
  *
  * Simple (same provider for intent and AI):
  *   echo "AI_PROVIDER=anthropic" > .env
- *   echo "AI_MODEL=claude-3-5-haiku-20241022" >> .env
+ *   echo "AI_MODEL=claude-haiku-4-5-20251001" >> .env
  *   echo "ANTHROPIC_API_KEY=your-key" >> .env
  *
  * Advanced (different providers for intent vs AI):
  *   echo "AI_PROVIDER=anthropic" > .env
- *   echo "AI_MODEL=claude-3-5-sonnet-20241022" >> .env
+ *   echo "AI_MODEL=claude-sonnet-5" >> .env
  *   echo "INTENT_PROVIDER=openai" >> .env
- *   echo "INTENT_MODEL=gpt-4o-mini" >> .env
+ *   echo "INTENT_MODEL=gpt-5.6-luna" >> .env
  *   echo "ANTHROPIC_API_KEY=your-anthropic-key" >> .env
  *   echo "OPENAI_API_KEY=your-openai-key" >> .env
  */

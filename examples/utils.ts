@@ -4,8 +4,8 @@
 import type { AIProvider } from '../src'
 
 const MODEL_EXAMPLES: Record<AIProvider, string[]> = {
-  anthropic: ['claude-3-5-haiku-20241022', 'claude-3-5-sonnet-20241022'],
-  openai: ['gpt-4o-mini', 'gpt-4o'],
+  anthropic: ['claude-haiku-4-5-20251001', 'claude-sonnet-5'],
+  openai: ['gpt-5.6-luna', 'gpt-5.6-terra'],
   ollama: ['llama3.2', 'deepseek-r1', 'qwen2.5', 'or run "ollama list"'],
 }
 

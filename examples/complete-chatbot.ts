@@ -6,12 +6,12 @@
  * Anthropic (Claude):
  *   echo "AI_PROVIDER=anthropic" > .env
  *   echo "ANTHROPIC_API_KEY=your-key" >> .env
- *   echo "AI_MODEL=claude-3-5-haiku-20241022" >> .env
+ *   echo "AI_MODEL=claude-haiku-4-5-20251001" >> .env
  *
  * OpenAI (GPT):
  *   echo "AI_PROVIDER=openai" > .env
  *   echo "OPENAI_API_KEY=your-key" >> .env
- *   echo "AI_MODEL=gpt-4o-mini" >> .env
+ *   echo "AI_MODEL=gpt-5.6-luna" >> .env
  *
  * Ollama (Local):
  *   echo "AI_PROVIDER=ollama" > .env
