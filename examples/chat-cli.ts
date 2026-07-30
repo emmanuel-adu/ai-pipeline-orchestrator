@@ -15,7 +15,7 @@
  * QUICK SETUP (30 seconds):
  *
  *   echo "AI_PROVIDER=anthropic" > .env
- *   echo "AI_MODEL=claude-3-5-haiku-20241022" >> .env
+ *   echo "AI_MODEL=claude-haiku-4-5-20251001" >> .env
  *   echo "ANTHROPIC_API_KEY=your-key-here" >> .env
  *   npm run example:chat
  *
