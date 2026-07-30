@@ -228,7 +228,8 @@ describe('Testing Utilities', () => {
       const context = createMockContext()
       await pipeline.execute(context)
 
-      expect(pipeline.executionTime).toBeGreaterThanOrEqual(50)
+      // 5ms tolerance for timer imprecision, matching the createDelayHandler test below
+      expect(pipeline.executionTime).toBeGreaterThanOrEqual(45)
     })
 
     it('should provide access to steps', () => {
