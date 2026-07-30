@@ -75,7 +75,7 @@ const result = await executeOrchestration(
       name: 'ai',
       handler: createAIHandler({
         provider: 'anthropic',
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-haiku-4-5-20251001',
         apiKey: process.env.ANTHROPIC_API_KEY,
         getSystemPrompt: () => 'You are a helpful assistant.',
       }),
@@ -92,8 +92,8 @@ console.log(result.context.aiResponse.text)
 
 | Provider | Package | Models | API Key | Best For |
 |----------|---------|--------|---------|----------|
-| **Anthropic** | `@ai-sdk/anthropic` | `claude-3-5-haiku-20241022`<br/>`claude-3-5-sonnet-20241022` | [Get key](https://console.anthropic.com) | Production, high-quality responses |
-| **OpenAI** | `@ai-sdk/openai` | `gpt-4o-mini`<br/>`gpt-4o` | [Get key](https://platform.openai.com) | Production, wide model selection |
+| **Anthropic** | `@ai-sdk/anthropic` | `claude-haiku-4-5-20251001`<br/>`claude-sonnet-5` | [Get key](https://console.anthropic.com) | Production, high-quality responses |
+| **OpenAI** | `@ai-sdk/openai` | `gpt-5.6-luna`<br/>`gpt-5.6-terra` | [Get key](https://platform.openai.com) | Production, wide model selection |
 | **Ollama** | `ai-sdk-ollama` | `llama3.2`, `deepseek-r1`, `qwen2.5`<br/>100+ more | Optional ([Cloud](https://ollama.com)) | Development, cost savings, offline |
 
 ### Provider Setup
@@ -104,7 +104,7 @@ console.log(result.context.aiResponse.text)
 ```bash
 # .env
 AI_PROVIDER=anthropic
-AI_MODEL=claude-3-5-haiku-20241022
+AI_MODEL=claude-haiku-4-5-20251001
 ANTHROPIC_API_KEY=your-key-here
 ```
 
@@ -148,7 +148,7 @@ Use a cloud provider for chat (best quality) + Ollama for intent classification 
 ```bash
 # .env
 AI_PROVIDER=anthropic
-AI_MODEL=claude-3-5-haiku-20241022
+AI_MODEL=claude-haiku-4-5-20251001
 ANTHROPIC_API_KEY=your-key-here
 
 INTENT_PROVIDER=ollama
@@ -280,7 +280,7 @@ import { LLMIntentClassifier, createIntentHandler } from 'ai-pipeline-orchestrat
 
 const classifier = new LLMIntentClassifier({
   provider: 'anthropic',
-  model: 'claude-3-5-haiku-20241022',
+  model: 'claude-haiku-4-5-20251001',
   apiKey: process.env.ANTHROPIC_API_KEY,
   categories: ['greeting', 'help', 'question'],
   categoryDescriptions: {
@@ -413,7 +413,7 @@ import { createAIHandler } from 'ai-pipeline-orchestrator'
 
 const handler = createAIHandler({
   provider: 'anthropic',
-  model: 'claude-3-5-sonnet-20241022',
+  model: 'claude-sonnet-5',
   apiKey: process.env.ANTHROPIC_API_KEY,
   temperature: 0.7,
   maxTokens: 1024,
@@ -431,7 +431,7 @@ import { createStreamingAIHandler } from 'ai-pipeline-orchestrator'
 
 const handler = createStreamingAIHandler({
   provider: 'anthropic',
-  model: 'claude-3-5-sonnet-20241022',
+  model: 'claude-sonnet-5',
   apiKey: process.env.ANTHROPIC_API_KEY,
   onChunk: (chunk) => sendToClient(chunk),
 })

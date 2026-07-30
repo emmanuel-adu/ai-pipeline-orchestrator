@@ -18,7 +18,7 @@
  * Anthropic (Claude):
  *   echo "AI_PROVIDER=anthropic" > .env
  *   echo "ANTHROPIC_API_KEY=your-key" >> .env
- *   echo "AI_MODEL=claude-3-5-haiku-20241022" >> .env
+ *   echo "AI_MODEL=claude-haiku-4-5-20251001" >> .env
  *   echo "PROMPT_VARIANT=variant-a" >> .env  # Optional: control, experiment, v2, etc.
  */
 import { getProviderCredentials, getSimpleEnvConfig } from './utils'
