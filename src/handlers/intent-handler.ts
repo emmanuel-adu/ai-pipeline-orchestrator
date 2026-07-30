@@ -10,6 +10,15 @@ export interface IntentHandlerConfig {
     classifier: LLMIntentClassifier
     confidenceThreshold?: number
   }
+  /**
+   * Classification strategy.
+   * - 'keyword-first' (default): classify by keyword match; call the LLM only when
+   *   confidence is below confidenceThreshold and llmFallback.enabled is true.
+   * - 'llm-primary': always classify via llmFallback.classifier. The keyword classifier
+   *   is only used as a fallback if the LLM call itself fails, and for tone/deepLink
+   *   metadata lookup. Requires llmFallback.enabled to be true.
+   */
+  mode?: 'keyword-first' | 'llm-primary'
   contextKey?: string
   onFallback?: (data: {
     message: string
@@ -23,8 +32,8 @@ export interface IntentHandlerConfig {
 }
 
 /**
- * Creates intent detection handler with hybrid classification.
- * Uses keyword matching first, falls back to LLM if confidence is low and LLM is enabled.
+ * Creates intent detection handler with keyword, LLM, or hybrid classification -
+ * see IntentHandlerConfig.mode.
  *
  * Keyword matching algorithm:
  * - Scoring: Each keyword match adds points equal to the keyword's word count.
@@ -32,13 +41,18 @@ export interface IntentHandlerConfig {
  * - Multi-word keywords (e.g., "help me") score 2 points
  *
  * - Selection: The category with the highest score wins. Confidence is calculated as the margin between the best and second-best scores, normalized to 0-1.
- *
- * Note: This is a simple heuristic. For production use, consider the LLM fallback option in createIntentHandler when confidence is low.
  */
 export function createIntentHandler(config: IntentHandlerConfig): OrchestrationHandler {
   const logger = config.logger ?? consoleLogger
+  const mode = config.mode ?? 'keyword-first'
   const confidenceThreshold = config.llmFallback?.confidenceThreshold ?? 0.5
   const contextKey = config.contextKey ?? 'intent'
+
+  if (mode === 'llm-primary' && !config.llmFallback?.enabled) {
+    throw new Error(
+      "createIntentHandler: mode 'llm-primary' requires llmFallback.enabled to be true and llmFallback.classifier to be set"
+    )
+  }
 
   return async (context: OrchestrationContext) => {
     const messages = context.request.messages
@@ -66,7 +80,11 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
     try {
       const keywordResult = config.classifier.classify(content)
 
-      if (keywordResult.confidence >= confidenceThreshold || !config.llmFallback?.enabled) {
+      const useLLM =
+        config.llmFallback?.enabled &&
+        (mode === 'llm-primary' || keywordResult.confidence < confidenceThreshold)
+
+      if (!useLLM) {
         logger.debug(
           {
             intent: keywordResult.intent,
@@ -87,15 +105,19 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
       }
 
       logger.debug(
-        {
-          keywordIntent: keywordResult.intent,
-          keywordConfidence: keywordResult.confidence,
-          threshold: confidenceThreshold,
-        },
-        'Keyword confidence low - using LLM fallback'
+        mode === 'llm-primary'
+          ? { threshold: confidenceThreshold }
+          : {
+              keywordIntent: keywordResult.intent,
+              keywordConfidence: keywordResult.confidence,
+              threshold: confidenceThreshold,
+            },
+        mode === 'llm-primary'
+          ? 'Classifying intent via LLM (llm-primary mode)'
+          : 'Keyword confidence low - using LLM fallback'
       )
 
-      const llmResult = await config.llmFallback.classifier.classify(content)
+      const llmResult = await config.llmFallback!.classifier.classify(content)
 
       // If LLM classification failed (0 confidence with error message), fall back to keyword result
       const hasError =
@@ -128,7 +150,7 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
         }
       }
 
-      if (config.onFallback) {
+      if (config.onFallback && mode !== 'llm-primary') {
         Promise.resolve(
           config.onFallback({
             message: content,
@@ -147,10 +169,10 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
         {
           intent: llmResult.intent,
           confidence: llmResult.confidence,
-          method: 'llm-fallback',
+          method: mode,
           reasoning: llmResult.reasoning,
         },
-        'Intent detected via LLM fallback'
+        mode === 'llm-primary' ? 'Intent detected via LLM' : 'Intent detected via LLM fallback'
       )
 
       // Look up metadata for the LLM's detected intent from keyword classifier config
