@@ -25,6 +25,19 @@ Build production-ready AI chatbots with composable handler pipelines. Handles in
 
 ---
 
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Providers](#providers)
+- [Usage](#usage)
+- [Try the Interactive Demo](#try-the-interactive-demo)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 | Feature | Description |
