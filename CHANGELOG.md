@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.3.0...ai-pipeline-orchestrator-v0.4.0) (2026-07-30)
+
+
+### Features
+
+* **intent:** add llm-primary mode to createIntentHandler ([3a16ae0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/3a16ae0bd9dcc7bd2fa52e5e93fff90defd52369))
+
+
+### Bug Fixes
+
+* **tests:** tolerate timer imprecision in execution-time test ([af30315](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/af30315a7beb9cea79af41006e3e5380c8068197))
+
+
+### Documentation
+
+* add table of contents to README ([9b293c3](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/9b293c30ab4bcba0e40a258769bad2f1d2caffac))
+
 ## [0.3.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.2.0...ai-pipeline-orchestrator-v0.3.0) (2026-01-15)
 
 
