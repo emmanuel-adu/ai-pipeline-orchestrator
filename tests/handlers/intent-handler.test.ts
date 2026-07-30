@@ -279,6 +279,109 @@ describe('createIntentHandler', () => {
     })
   })
 
+  describe('llm-primary mode', () => {
+    it('should classify via LLM even when keyword confidence is high', async () => {
+      const mockLLMClassifier = {
+        classify: vi.fn(async () => ({
+          intent: 'question',
+          confidence: 0.9,
+          reasoning: 'User is asking a question',
+        })),
+      }
+
+      const handler = createIntentHandler({
+        classifier,
+        mode: 'llm-primary',
+        llmFallback: {
+          enabled: true,
+          classifier: mockLLMClassifier as any,
+        },
+      })
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'Hello there! Hi everyone!' }],
+        },
+      }
+
+      const result = await handler(context)
+
+      expect(mockLLMClassifier.classify).toHaveBeenCalledWith('Hello there! Hi everyone!')
+      expect((result.intent as any).intent).toBe('question')
+      expect((result.intent as any).method).toBe('llm')
+    })
+
+    it('should fall back to keyword result when the LLM call fails', async () => {
+      const mockLLMClassifier = {
+        classify: vi.fn(async () => ({
+          intent: 'general',
+          confidence: 0,
+          reasoning: 'LLM classification failed: network error',
+        })),
+      }
+
+      const handler = createIntentHandler({
+        classifier,
+        mode: 'llm-primary',
+        llmFallback: {
+          enabled: true,
+          classifier: mockLLMClassifier as any,
+        },
+      })
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'Hello there!' }],
+        },
+      }
+
+      const result = await handler(context)
+
+      expect((result.intent as any).intent).toBe('greeting')
+      expect((result.intent as any).method).toBe('keyword')
+      expect((result.intent as any).metadata?.llmFallbackAttempted).toBe(true)
+    })
+
+    it('should not invoke onFallback when successfully classifying via LLM', async () => {
+      const onFallbackSpy = vi.fn()
+      const mockLLMClassifier = {
+        classify: vi.fn(async () => ({
+          intent: 'question',
+          confidence: 0.9,
+        })),
+      }
+
+      const handler = createIntentHandler({
+        classifier,
+        mode: 'llm-primary',
+        llmFallback: {
+          enabled: true,
+          classifier: mockLLMClassifier as any,
+        },
+        onFallback: onFallbackSpy,
+      })
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'Hello there!' }],
+        },
+      }
+
+      await handler(context)
+
+      expect(onFallbackSpy).not.toHaveBeenCalled()
+    })
+
+    it('should throw if llmFallback is not enabled', () => {
+      expect(() =>
+        createIntentHandler({
+          classifier,
+          mode: 'llm-primary',
+        })
+      ).toThrow(/llm-primary/)
+    })
+  })
+
   it('should handle empty messages', async () => {
     const handler = createIntentHandler({
       classifier,
