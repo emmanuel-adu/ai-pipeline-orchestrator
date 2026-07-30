@@ -288,10 +288,21 @@ const handler = createIntentHandler({ classifier })
 <details>
 <summary><strong>LLM-based</strong> (accurate, paid)</summary>
 
-```typescript
-import { LLMIntentClassifier, createIntentHandler } from 'ai-pipeline-orchestrator'
+Classify every message via LLM using `mode: 'llm-primary'`. The keyword classifier is
+still required - it's used as a fallback if the LLM call fails, and to look up
+tone/deepLink metadata for the detected intent.
 
-const classifier = new LLMIntentClassifier({
+```typescript
+import { IntentClassifier, LLMIntentClassifier, createIntentHandler } from 'ai-pipeline-orchestrator'
+
+const keywordClassifier = new IntentClassifier({
+  patterns: [
+    { category: 'greeting', keywords: ['hello', 'hi', 'hey'] },
+    { category: 'help', keywords: ['help', 'support'] },
+  ],
+})
+
+const llmClassifier = new LLMIntentClassifier({
   provider: 'anthropic',
   model: 'claude-3-5-haiku-20241022',
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -303,7 +314,14 @@ const classifier = new LLMIntentClassifier({
   },
 })
 
-const handler = createIntentHandler({ classifier })
+const handler = createIntentHandler({
+  classifier: keywordClassifier,
+  mode: 'llm-primary',
+  llmFallback: {
+    enabled: true,
+    classifier: llmClassifier,
+  },
+})
 ```
 
 </details>
