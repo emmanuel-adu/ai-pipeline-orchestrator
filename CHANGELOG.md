@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.4.0...ai-pipeline-orchestrator-v0.4.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* **npm:** package vuln update ([f9440af](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/f9440af57216b97e6242ab05e0ff1baeac333999))
+
 ## [0.4.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.3.0...ai-pipeline-orchestrator-v0.4.0) (2026-07-30)
 
 
