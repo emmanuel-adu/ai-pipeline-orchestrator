@@ -3,6 +3,13 @@ name: Publish to NPM
 on:
   release:
     types: [published]
+  # Re-publish an existing release tag, e.g. after a failed publish. Release-triggered
+  # reruns use the workflow file from the tag, so fixes here only apply via dispatch.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (e.g. ai-pipeline-orchestrator-v0.5.0)'
+        required: true
 
 # id-token lets npm verify this workflow via OIDC (trusted publishing), so no NPM_TOKEN
 # secret is needed and provenance is attached automatically.
@@ -16,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
