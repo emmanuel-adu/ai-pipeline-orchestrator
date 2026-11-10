@@ -14,9 +14,9 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           # Use PAT if available, otherwise fall back to GITHUB_TOKEN
@@ -27,7 +27,7 @@ jobs:
       # Trigger CI workflow on the release-please branch if PR was created
       - name: Trigger CI on release branch
         if: steps.release.outputs.pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         # Passed via env, not interpolated into the script: PR titles can contain quotes
         # (e.g. "TypeSafe's"), which broke the generated JS and allowed script injection.
         env:
