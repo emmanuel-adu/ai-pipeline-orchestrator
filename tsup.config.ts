@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'core/index': 'src/core/index.ts',
     'intent/index': 'src/intent/index.ts',
+    'intent/jev': 'src/intent/jev-classifier.ts',
     'context/index': 'src/context/index.ts',
     'handlers/index': 'src/handlers/index.ts',
     'providers/index': 'src/providers/index.ts',
@@ -30,5 +31,6 @@ export default defineConfig({
     '@upstash/ratelimit',
     '@upstash/redis',
     '@prisma/client',
+    '@typesafe-ai/sdk',
   ],
 })

@@ -77,7 +77,7 @@ describe('createIntentHandler', () => {
         classifier,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
       })
@@ -113,7 +113,7 @@ describe('createIntentHandler', () => {
         classifier,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
       })
@@ -145,7 +145,7 @@ describe('createIntentHandler', () => {
         classifier,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
       })
@@ -178,7 +178,7 @@ describe('createIntentHandler', () => {
         classifier,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
         onFallback: onFallbackSpy,
@@ -213,7 +213,7 @@ describe('createIntentHandler', () => {
         classifier,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
       })
@@ -259,7 +259,7 @@ describe('createIntentHandler', () => {
         classifier: classifierWithAuth,
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
           confidenceThreshold: 0.5,
         },
       })
@@ -294,7 +294,7 @@ describe('createIntentHandler', () => {
         mode: 'llm-primary',
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
         },
       })
 
@@ -325,7 +325,7 @@ describe('createIntentHandler', () => {
         mode: 'llm-primary',
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
         },
       })
 
@@ -342,6 +342,38 @@ describe('createIntentHandler', () => {
       expect((result.intent as any).metadata?.llmFallbackAttempted).toBe(true)
     })
 
+    it('should fall back to keyword result when the classifier reports an error', async () => {
+      const mockLLMClassifier = {
+        classify: vi.fn(async () => ({
+          intent: 'general',
+          confidence: 0,
+          reasoning: 'rate limited',
+          error: '429 Too Many Requests',
+        })),
+      }
+
+      const handler = createIntentHandler({
+        classifier,
+        mode: 'llm-primary',
+        llmFallback: {
+          enabled: true,
+          classifier: mockLLMClassifier,
+        },
+      })
+
+      const context: OrchestrationContext = {
+        request: {
+          messages: [{ role: 'user', content: 'Hello there!' }],
+        },
+      }
+
+      const result = await handler(context)
+
+      expect((result.intent as any).intent).toBe('greeting')
+      expect((result.intent as any).method).toBe('keyword')
+      expect((result.intent as any).metadata?.llmError).toBe('429 Too Many Requests')
+    })
+
     it('should not invoke onFallback when successfully classifying via LLM', async () => {
       const onFallbackSpy = vi.fn()
       const mockLLMClassifier = {
@@ -356,7 +388,7 @@ describe('createIntentHandler', () => {
         mode: 'llm-primary',
         llmFallback: {
           enabled: true,
-          classifier: mockLLMClassifier as any,
+          classifier: mockLLMClassifier,
         },
         onFallback: onFallbackSpy,
       })

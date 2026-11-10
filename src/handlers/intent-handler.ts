@@ -1,13 +1,13 @@
 import type { OrchestrationContext, OrchestrationHandler } from '../core/types'
 import type { IntentClassifier } from '../intent/classifier'
-import type { LLMIntentClassifier } from '../intent/llm-classifier'
+import type { AsyncIntentClassifier } from '../intent/types'
 import { consoleLogger, type Logger } from '../utils/logger'
 
 export interface IntentHandlerConfig {
   classifier: IntentClassifier
   llmFallback?: {
     enabled: boolean
-    classifier: LLMIntentClassifier
+    classifier: AsyncIntentClassifier
     confidenceThreshold?: number
   }
   /**
@@ -119,18 +119,20 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
 
       const llmResult = await config.llmFallback!.classifier.classify(content)
 
-      // If LLM classification failed (0 confidence with error message), fall back to keyword result
-      const hasError =
+      // Custom classifiers written before `error` existed signal failure through `reasoning`
+      const hasLegacyError =
+        llmResult.confidence === 0 &&
         llmResult.reasoning &&
         (llmResult.reasoning.includes('failed') ||
           llmResult.reasoning.includes('Error') ||
           llmResult.reasoning.includes('Unsupported') ||
           llmResult.reasoning.includes('not available'))
 
-      if (llmResult.confidence === 0 && hasError) {
+      if (llmResult.error !== undefined || hasLegacyError) {
+        const llmError = llmResult.error ?? llmResult.reasoning
         logger.warn(
           {
-            error: llmResult.reasoning,
+            error: llmError,
             fallingBackTo: 'keyword',
           },
           'LLM classification failed - using keyword result'
@@ -144,7 +146,7 @@ export function createIntentHandler(config: IntentHandlerConfig): OrchestrationH
             metadata: {
               ...keywordResult.metadata,
               llmFallbackAttempted: true,
-              llmError: llmResult.reasoning,
+              llmError,
             },
           },
         }

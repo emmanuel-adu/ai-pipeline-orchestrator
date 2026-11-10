@@ -1,3 +1,5 @@
+import type { AsyncIntentClassifier, AsyncIntentResult } from './types'
+
 import { z } from 'zod'
 
 import { createModel, type ProviderConfig } from '../providers'
@@ -12,12 +14,7 @@ export interface LLMClassifierConfig extends ProviderConfig {
 async function classifyWithLLM(
   message: string,
   config: LLMClassifierConfig
-): Promise<{
-  intent: string
-  confidence: number
-  reasoning?: string
-  usage?: any
-}> {
+): Promise<AsyncIntentResult> {
   try {
     const { generateObject } = await import('ai')
 
@@ -51,10 +48,12 @@ async function classifyWithLLM(
       usage,
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'LLM classification failed'
     return {
       intent: 'general',
       confidence: 0,
-      reasoning: error instanceof Error ? error.message : 'LLM classification failed',
+      reasoning: errorMessage,
+      error: errorMessage,
     }
   }
 }
@@ -73,15 +72,10 @@ Return the most likely intent, confidence (0-1), and brief reasoning.`
  * LLM-based intent classifier.
  * More accurate than keyword matching but requires API calls.
  */
-export class LLMIntentClassifier {
+export class LLMIntentClassifier implements AsyncIntentClassifier {
   constructor(private config: LLMClassifierConfig) {}
 
-  async classify(message: string): Promise<{
-    intent: string
-    confidence: number
-    reasoning?: string
-    usage?: any
-  }> {
+  async classify(message: string): Promise<AsyncIntentResult> {
     return classifyWithLLM(message, this.config)
   }
 }
