@@ -91,17 +91,3 @@ When you merge a Release PR:
 3. ✅ Git tag is created (e.g., `v0.2.0`)
 4. ✅ GitHub release is published
 5. ✅ Package is published to npm
-
-### Manual Changelog (Optional)
-
-For local development or testing, you can manually generate changelog entries:
-
-```bash
-# Generate changelog for new commits since last release
-npm run changelog
-
-# Regenerate entire changelog
-npm run changelog:init
-```
-
-**Note:** Manual changelog updates are not needed for releases - release-please handles this automatically.
