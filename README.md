@@ -265,7 +265,7 @@ const handler = createRateLimitHandler({
 
 #### Intent Detection
 
-Three modes: keyword-only, LLM-only, or hybrid.
+Three modes: keyword-only, LLM-only, or hybrid. The LLM step accepts any `AsyncIntentClassifier`.
 
 <details>
 <summary><strong>Keyword-based</strong> (fast, free)</summary>
@@ -323,6 +323,47 @@ const handler = createIntentHandler({
   },
 })
 ```
+
+</details>
+
+<details>
+<summary><strong>Jev decision model</strong> (fast, cheap, no output parsing)</summary>
+
+`JevIntentClassifier` uses [TypeSafe's Jev](https://docs.typesafe.ai), a decision model that
+returns calibrated probabilities over your categories instead of generated text. It plugs into
+`llmFallback` anywhere an `LLMIntentClassifier` does.
+
+```bash
+npm install @typesafe-ai/sdk # requires Node.js 22+
+```
+
+```typescript
+import { JevIntentClassifier } from 'ai-pipeline-orchestrator/intent/jev'
+
+const jevClassifier = new JevIntentClassifier({
+  apiKey: process.env.TYPESAFE_API_KEY,
+  model: 'jev-1.14.0', // pin a version once thresholds are tuned; default 'jev-latest'
+  categories: ['greeting', 'help', 'question', 'general'],
+  categoryDescriptions: {
+    greeting: 'User says hello',
+    help: 'User needs help',
+    question: 'User asks a question',
+  },
+  fallbackIntent: 'general', // returned when no category fits (default)
+  matchThreshold: 0.7, // min p(any category fits) to trust the pick (default)
+})
+
+const handler = createIntentHandler({
+  classifier: keywordClassifier,
+  mode: 'llm-primary',
+  llmFallback: { enabled: true, classifier: jevClassifier },
+})
+```
+
+Each call asks two questions in one request: which category fits best, and whether any category
+fits at all. Off-topic messages fall through to `fallbackIntent` rather than being forced into the
+closest category. API failures come back with `error` set, so the handler falls back to the
+keyword result.
 
 </details>
 
@@ -536,6 +577,8 @@ The demo showcases all features in real-time:
 |--------|-------------|
 | `IntentClassifier` | Keyword-based detection |
 | `LLMIntentClassifier` | LLM-based detection with structured output |
+| `JevIntentClassifier` | Jev decision model detection (`ai-pipeline-orchestrator/intent/jev`) |
+| `AsyncIntentClassifier` | Interface for custom classifiers passed to `llmFallback` |
 | `createIntentHandler(config)` | Creates intent handler |
 
 ### Context

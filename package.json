@@ -11,7 +11,9 @@
     "chatbot",
     "llm",
     "claude",
-    "anthropic"
+    "anthropic",
+    "typesafe",
+    "jev"
   ],
   "author": "Emmanuel Adu",
   "license": "MIT",
@@ -37,6 +39,11 @@
       "types": "./dist/intent/index.d.ts",
       "import": "./dist/intent/index.mjs",
       "require": "./dist/intent/index.cjs"
+    },
+    "./intent/jev": {
+      "types": "./dist/intent/jev.d.ts",
+      "import": "./dist/intent/jev.mjs",
+      "require": "./dist/intent/jev.cjs"
     },
     "./context": {
       "types": "./dist/context/index.d.ts",
@@ -111,6 +118,7 @@
     "@ai-sdk/anthropic": ">=0.0.51",
     "@ai-sdk/openai": ">=0.0.59",
     "@prisma/client": ">=5.0.0",
+    "@typesafe-ai/sdk": ">=0.7.0",
     "@upstash/ratelimit": ">=2.0.0",
     "@upstash/redis": ">=1.0.0",
     "ai": ">=4.0.0",
@@ -137,6 +145,9 @@
     },
     "@prisma/client": {
       "optional": true
+    },
+    "@typesafe-ai/sdk": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -146,6 +157,7 @@
     "@commitlint/config-conventional": "^20.3.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^20.0.0",
+    "@typesafe-ai/sdk": "^0.7.0",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "@vitest/coverage-v8": "^4.0.16",

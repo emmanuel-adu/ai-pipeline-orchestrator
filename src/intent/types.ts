@@ -19,3 +19,17 @@ export interface IntentResult {
   matchedKeywords?: string[]
   metadata?: Record<string, unknown>
 }
+
+export interface AsyncIntentResult {
+  intent: string
+  confidence: number
+  reasoning?: string
+  usage?: any
+  /** Set when classification itself failed, so callers can tell a failure from a real answer. */
+  error?: string
+}
+
+/** Contract for classifiers that call a model, used by createIntentHandler's llmFallback. */
+export interface AsyncIntentClassifier {
+  classify(message: string): Promise<AsyncIntentResult>
+}

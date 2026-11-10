@@ -1,3 +1,5 @@
+import type { AsyncIntentClassifier, AsyncIntentResult } from './types'
+
 import { createModel, type ProviderConfig } from '../providers'
 
 export interface TextLLMClassifierConfig extends ProviderConfig {
@@ -10,12 +12,7 @@ export interface TextLLMClassifierConfig extends ProviderConfig {
 async function classifyWithTextLLM(
   message: string,
   config: TextLLMClassifierConfig
-): Promise<{
-  intent: string
-  confidence: number
-  reasoning?: string
-  usage?: any
-}> {
+): Promise<AsyncIntentResult> {
   try {
     const { generateText } = await import('ai')
 
@@ -45,10 +42,12 @@ async function classifyWithTextLLM(
       usage,
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'LLM classification failed'
     return {
       intent: 'general',
       confidence: 0,
-      reasoning: error instanceof Error ? error.message : 'LLM classification failed',
+      reasoning: errorMessage,
+      error: errorMessage,
     }
   }
 }
@@ -108,15 +107,10 @@ function parseResponse(
  * Works with models that don't support structured output (like some Ollama models).
  * Uses text generation with manual parsing instead of generateObject.
  */
-export class TextLLMIntentClassifier {
+export class TextLLMIntentClassifier implements AsyncIntentClassifier {
   constructor(private config: TextLLMClassifierConfig) {}
 
-  async classify(message: string): Promise<{
-    intent: string
-    confidence: number
-    reasoning?: string
-    usage?: any
-  }> {
+  async classify(message: string): Promise<AsyncIntentResult> {
     return classifyWithTextLLM(message, this.config)
   }
 }
