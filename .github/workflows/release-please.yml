@@ -27,9 +27,13 @@ jobs:
       - name: Trigger CI on release branch
         if: steps.release.outputs.pr
         uses: actions/github-script@v7
+        # Passed via env, not interpolated into the script: PR titles can contain quotes
+        # (e.g. "TypeSafe's"), which broke the generated JS and allowed script injection.
+        env:
+          PR_OUTPUT: ${{ steps.release.outputs.pr }}
         with:
           script: |
-            const prOutput = '${{ steps.release.outputs.pr }}';
+            const prOutput = process.env.PR_OUTPUT;
             if (!prOutput) return;
 
             // Parse PR number - handle both JSON object and direct number
