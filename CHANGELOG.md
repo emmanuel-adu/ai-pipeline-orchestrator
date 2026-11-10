@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.4.1...ai-pipeline-orchestrator-v0.5.0) (2026-11-10)
+
+
+### Features
+
+* **intent:** add JevIntentClassifier backed by TypeSafe's Jev model ([#22](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/issues/22)) ([08990e3](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/08990e37749d871847f1f029b45faf18457b29c2))
+
+
+### Bug Fixes
+
+* **ci:** pass release-please PR output to github-script via env ([#24](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/issues/24)) ([aac9f17](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/commit/aac9f17c187f2b5e802cadf1a0d025499740ac85))
+
 ## [0.4.1](https://github.com/emmanuel-adu/ai-pipeline-orchestrator/compare/ai-pipeline-orchestrator-v0.4.0...ai-pipeline-orchestrator-v0.4.1) (2026-08-02)
 
 
